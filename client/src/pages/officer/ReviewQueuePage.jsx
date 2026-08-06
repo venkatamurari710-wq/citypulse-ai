@@ -38,7 +38,9 @@ export default function ReviewQueuePage() {
   const { user } = useAuth();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = searchParams.get('tab') || 'needs_review';
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const LIMIT = 15;
 
   const [summary, setSummary] = useState({
     totalComplaints: 0,

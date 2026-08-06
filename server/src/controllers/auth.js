@@ -216,7 +216,10 @@ export async function getMe(req, res, next) {
       .eq('id', req.user.id)
       .maybeSingle();
 
-    if (error || !user) return next(createError(404, 'User not found'));
+    if (error || !user) {
+      console.warn(`[AUTH GET_ME FAIL] User session invalid for ID "${req.user?.id}":`, error?.message || 'User not found in DB');
+      return next(createError(401, 'Invalid or expired authentication session'));
+    }
 
     let assignedDeptName = null;
     if (user.department_id) {
@@ -228,8 +231,25 @@ export async function getMe(req, res, next) {
       if (dept) assignedDeptName = dept.name;
     }
 
+    if (!assignedDeptName && user.role === 'officer') {
+      const { data: deptOfficer } = await supabase
+        .from('department_officers')
+        .select('department_id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (deptOfficer?.department_id) {
+        const { data: dept } = await supabase
+          .from('departments')
+          .select('name')
+          .eq('id', deptOfficer.department_id)
+          .maybeSingle();
+        if (dept) assignedDeptName = dept.name;
+      }
+    }
+
     const safeUser = {
       ...user,
+      fullName: user.full_name,
       assignedDepartment: assignedDeptName || (user.role === 'officer' ? 'Not Assigned' : null),
     };
     res.json({ user: safeUser });
