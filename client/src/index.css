@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import 'leaflet/dist/leaflet.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base ─────────────────────────────────────────────────────────── */
+@layer base {
+  * { @apply border-neutral-200; }
+  html { @apply scroll-smooth; }
+  body {
+    @apply bg-neutral-50 text-neutral-900 font-sans antialiased;
+    background-image: radial-gradient(ellipse at 20% 10%, rgba(99,102,241,0.04) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 90%, rgba(16,185,129,0.03) 0%, transparent 50%);
+    min-height: 100vh;
+  }
+  h1, h2, h3, h4, h5, h6 { @apply font-display font-bold text-neutral-900 tracking-tight; }
+  a { @apply transition-colors; }
+  input, select, textarea { 
+    @apply bg-white border border-neutral-300 rounded-xl px-4 py-2.5 text-neutral-900 
+    placeholder-neutral-400 outline-none transition-all duration-200 shadow-sm
+    focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 focus:bg-white;
+  }
+  label { @apply block text-sm font-semibold text-neutral-700 mb-1.5; }
+}
+
+/* ── Components ───────────────────────────────────────────────────── */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl
+      font-semibold text-sm transition-all duration-200 cursor-pointer
+      disabled:opacity-50 disabled:cursor-not-allowed select-none shadow-sm;
+  }
+  .btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-700 
+      active:scale-[0.98] shadow-primary-500/20 hover:shadow-md;
+  }
+  .btn-accent {
+    @apply btn bg-emerald-600 text-white hover:bg-emerald-700
+      active:scale-[0.98] hover:shadow-md;
+  }
+  .btn-ghost {
+    @apply btn bg-white text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900 border border-neutral-200;
+  }
+  .btn-danger {
+    @apply btn bg-rose-600 text-white hover:bg-rose-700 active:scale-[0.98] hover:shadow-md;
+  }
+  .btn-success {
+    @apply btn bg-emerald-600 text-white hover:bg-emerald-700 active:scale-[0.98] hover:shadow-md;
+  }
+  .btn-sm { @apply btn text-xs px-3 py-1.5 rounded-lg; }
+  .btn-lg { @apply btn text-base px-6 py-3 rounded-xl; }
+
+  .card {
+    @apply bg-white border border-neutral-200/80 rounded-2xl 
+      shadow-card transition-all duration-200;
+  }
+  .card-hover {
+    @apply card hover:border-primary-300 hover:shadow-card-hover hover:-translate-y-0.5;
+  }
+
+  .input-group {
+    @apply flex flex-col gap-1.5;
+  }
+  .input-error {
+    @apply border-rose-500 focus:border-rose-500 focus:ring-rose-500/10;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+  .badge-primary { @apply badge bg-primary-50 text-primary-700 border border-primary-200; }
+  .badge-success { @apply badge bg-emerald-50 text-emerald-700 border border-emerald-200; }
+  .badge-warning { @apply badge bg-amber-50 text-amber-700 border border-amber-200; }
+  .badge-danger { @apply badge bg-rose-50 text-rose-700 border border-rose-200; }
+  .badge-accent { @apply badge bg-indigo-50 text-indigo-700 border border-indigo-200; }
+  .badge-ghost { @apply badge bg-neutral-100 text-neutral-600 border border-neutral-200; }
+
+  .page-title { @apply text-2xl lg:text-3xl font-display font-bold text-neutral-900 tracking-tight; }
+  .section-title { @apply text-lg font-display font-semibold text-neutral-800; }
+
+  .glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/60 shadow-card;
+  }
+
+  .nav-link {
+    @apply flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-neutral-600 font-medium text-sm
+      hover:bg-neutral-100 hover:text-neutral-900 transition-all duration-150;
+  }
+  .nav-link-active {
+    @apply bg-primary-50 text-primary-700 font-semibold border border-primary-100 shadow-xs;
+  }
+
+  .stat-card {
+    @apply card p-5 flex flex-col gap-2 bg-white border-neutral-200;
+  }
+
+  .form-field {
+    @apply flex flex-col gap-1.5 w-full;
+  }
+  .field-error {
+    @apply text-xs font-medium text-rose-600 mt-0.5;
+  }
+
+  .divider {
+    @apply border-t border-neutral-200 my-6;
+  }
+
+  .table-base {
+    @apply w-full text-sm border-collapse;
+  }
+  .table-base th {
+    @apply text-left text-xs font-bold text-neutral-500 uppercase tracking-wider px-4 py-3 bg-neutral-50/80 border-b border-neutral-200;
+  }
+  .table-base td {
+    @apply px-4 py-3.5 border-b border-neutral-100 text-neutral-700;
+  }
+  .table-base tr:hover td {
+    @apply bg-neutral-50/60;
+  }
+
+  /* Severity colors */
+  .severity-low { @apply bg-emerald-50 text-emerald-700 border-emerald-200; }
+  .severity-medium { @apply bg-amber-50 text-amber-700 border-amber-200; }
+  .severity-high { @apply bg-orange-50 text-orange-700 border-orange-200; }
+  .severity-critical { @apply bg-rose-50 text-rose-700 border-rose-200 font-bold; }
+
+  /* Status colors */
+  .status-pending { @apply bg-neutral-100 text-neutral-700 border-neutral-200; }
+  .status-analyzing { @apply bg-indigo-50 text-indigo-700 border-indigo-200; }
+  .status-needs_review { @apply bg-amber-50 text-amber-700 border-amber-200; }
+  .status-assigned { @apply bg-blue-50 text-blue-700 border-blue-200; }
+  .status-in_progress { @apply bg-primary-50 text-primary-700 border-primary-200; }
+  .status-resolved { @apply bg-emerald-50 text-emerald-700 border-emerald-200; }
+  .status-closed { @apply bg-neutral-100 text-neutral-500 border-neutral-200; }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: theme('colors.neutral.100'); }
+  ::-webkit-scrollbar-thumb { background: theme('colors.neutral.300'); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: theme('colors.neutral.400'); }
+}
+
+/* ── Leaflet overrides ────────────────────────────────────────────── */
+.leaflet-container {
+  background: #f8fafc !important;
+  border-radius: 1rem;
+}
+.leaflet-popup-content-wrapper {
+  @apply bg-white border border-neutral-200 rounded-xl text-neutral-900 shadow-lg;
+}
+.leaflet-popup-tip { background: white; }
+
+/* ── File upload drop zone ───────────────────────────────────────── */
+.drop-zone {
+  @apply border-2 border-dashed border-neutral-300 rounded-2xl p-8 text-center
+    transition-all duration-200 cursor-pointer bg-neutral-50/50;
+}
+.drop-zone-active {
+  @apply border-primary-500 bg-primary-50/50;
+}
+.drop-zone:hover {
+  @apply border-primary-400 bg-white;
+}
