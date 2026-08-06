@@ -2,9 +2,13 @@
 import axios from 'axios';
 
 function getApiBaseUrl() {
-  const envUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
+  const envUrl =
+    import.meta.env.VITE_API_BASE_URL ||
+    import.meta.env.VITE_API_URL ||
+    import.meta.env.VITE_SERVER_URL;
+
   if (!envUrl) {
-    console.warn('[CityPulse API] WARNING: Neither VITE_API_URL nor VITE_API_BASE_URL is set on Vercel environment variables! Calls will fallback to relative /api.');
+    console.warn('[CityPulse API] WARNING: Neither VITE_API_URL nor VITE_SERVER_URL is set in Vercel environment variables! Calls will fallback to relative /api.');
     return '/api';
   }
 
