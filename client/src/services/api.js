@@ -3,7 +3,10 @@ import axios from 'axios';
 
 function getApiBaseUrl() {
   const envUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
-  if (!envUrl) return '/api';
+  if (!envUrl) {
+    console.warn('[CityPulse API] WARNING: Neither VITE_API_URL nor VITE_API_BASE_URL is set on Vercel environment variables! Calls will fallback to relative /api.');
+    return '/api';
+  }
 
   let cleanUrl = envUrl.trim().replace(/\/+$/, '');
   if (!cleanUrl.endsWith('/api')) {
@@ -14,9 +17,7 @@ function getApiBaseUrl() {
 
 const baseURL = getApiBaseUrl();
 
-if (import.meta.env.DEV || import.meta.env.MODE === 'development') {
-  console.log('[CityPulse API] Initialized with baseURL:', baseURL);
-}
+console.log('[CityPulse API] Active baseURL:', baseURL);
 
 export const api = axios.create({
   baseURL,
