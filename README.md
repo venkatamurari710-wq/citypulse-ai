@@ -262,3 +262,5 @@ Key tables:
 ## 📄 License
 
 MIT — built for demonstration of AI civic intelligence capabilities.
+#   c i t y p u l s e - a i  
+ 
