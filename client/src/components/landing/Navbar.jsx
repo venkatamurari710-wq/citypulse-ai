@@ -5,6 +5,8 @@ import { Shield, Menu, X, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../../contexts/ThemeContext';
 
+import CityPulseLogo from '../shared/CityPulseLogo';
+
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -60,14 +62,7 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Left Logo */}
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#7C3AED] via-violet-600 to-purple-500 flex items-center justify-center text-white shadow-md shadow-violet-500/25 group-hover:scale-105 transition-transform">
-            <Shield className="w-5 h-5 fill-white/20" />
-          </div>
-          <span className="font-grotesk font-extrabold text-2xl tracking-tight text-[#111827] dark:text-white flex items-center gap-1">
-            CityPulse <span className="bg-gradient-to-r from-[#7C3AED] to-purple-600 bg-clip-text text-transparent">AI</span>
-          </span>
-        </Link>
+        <CityPulseLogo size="md" />
 
         {/* Center Nav Links */}
         <nav className="hidden md:flex items-center gap-6 lg:gap-8">

@@ -1,6 +1,7 @@
 // client/src/components/landing/FooterSection.jsx
 import { Link } from 'react-router-dom';
-import { Shield, Building2, Heart, ArrowUp } from 'lucide-react';
+import { Building2, Heart, ArrowUp } from 'lucide-react';
+import CityPulseLogo from '../shared/CityPulseLogo';
 
 export default function FooterSection() {
   const scrollToTop = () => {
@@ -14,14 +15,7 @@ export default function FooterSection() {
           
           {/* Column 1: Brand Info */}
           <div className="lg:col-span-2 space-y-4">
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center text-white shadow-md">
-                <Shield className="w-5 h-5" />
-              </div>
-              <span className="font-display font-extrabold text-xl tracking-tight text-white flex items-center gap-1">
-                CityPulse <span className="text-indigo-400">AI</span>
-              </span>
-            </Link>
+            <CityPulseLogo size="md" to="/" />
             <p className="text-sm text-slate-400 max-w-sm font-normal leading-relaxed">
               AI-Powered Smart City platform streamlining citizen complaint reporting, neural classification, geospatial duplicate detection, and automated department routing.
             </p>

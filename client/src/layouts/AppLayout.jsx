@@ -2,11 +2,12 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
-  Shield, LayoutDashboard, FileText, Map, Plus, LogOut,
-  User, Menu, X, ClipboardList, Building2, Flame,
+  LayoutDashboard, FileText, Map, Plus, LogOut,
+  User, Menu, X, Building2, Flame,
   Settings, ChevronDown, Users
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import CityPulseLogo from '../components/shared/CityPulseLogo';
 
 function NavItem({ to, icon: Icon, label }) {
   return (
@@ -52,8 +53,6 @@ export default function AppLayout({ children }) {
     { to: '/admin/users', icon: Users, label: 'Users' },
   ];
 
-  const isCitizen = user?.role === 'citizen';
-
   return (
     <div className="min-h-screen flex bg-neutral-50 text-neutral-900">
       {/* Sidebar overlay (mobile) */}
@@ -67,42 +66,33 @@ export default function AppLayout({ children }) {
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:static lg:flex`}>
         
         {/* Logo */}
-        <div className="p-5 border-b border-neutral-100 flex items-center justify-between">
-          <Link to={isOfficer ? "/review-queue" : "/dashboard"} className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-primary-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-sm">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <div className="text-sm font-display font-bold text-neutral-900">CityPulse AI</div>
-              <div className="text-xs text-neutral-500 capitalize font-medium">{user?.role?.replace('_', ' ')}</div>
-            </div>
-          </Link>
+        <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
+          <CityPulseLogo size="sm" to={isOfficer ? "/review-queue" : "/dashboard"} />
           <button className="lg:hidden text-neutral-400 hover:text-neutral-600" onClick={() => setSidebarOpen(false)}>
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-3.5 flex flex-col gap-1 overflow-y-auto">
-          {isCitizen && (
-            <>
-              <div className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mb-1 mt-1">Main Menu</div>
-              {citizenNav.map(n => <NavItem key={n.to} {...n} />)}
-            </>
-          )}
-
-          {isOfficer && (
-            <>
-              <div className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mb-1 mt-1">Officer Tools</div>
-              {officerNav.map(n => <NavItem key={n.to} {...n} />)}
-            </>
-          )}
+        <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
+          <div className="space-y-1">
+            <div className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mb-2 font-display">
+              {isOfficer ? 'Officer Portal' : 'Citizen Workspace'}
+            </div>
+            {(isOfficer ? officerNav : citizenNav).map(item => (
+              <NavItem key={item.to} {...item} />
+            ))}
+          </div>
 
           {isAdmin && (
-            <>
-              <div className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mt-4 mb-1">Administration</div>
-              {adminNav.map(n => <NavItem key={n.to} {...n} />)}
-            </>
+            <div className="space-y-1 pt-4 border-t border-neutral-100">
+              <div className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mb-2 font-display">
+                Administration
+              </div>
+              {adminNav.map(item => (
+                <NavItem key={item.to} {...item} />
+              ))}
+            </div>
           )}
         </nav>
 
@@ -138,25 +128,30 @@ export default function AppLayout({ children }) {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar (mobile) */}
-        <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-neutral-200 sticky top-0 z-20 shadow-xs">
-          <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-neutral-100 text-neutral-600">
-            <Menu className="w-5 h-5" />
-          </button>
-          <Link to={isOfficer ? "/review-queue" : "/dashboard"} className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-primary-600" />
-            <span className="font-display font-bold text-neutral-900 text-sm">CityPulse AI</span>
-          </Link>
-          {isCitizen ? (
-            <Link to="/report" className="p-2 bg-primary-600 rounded-lg text-white">
+        {/* Top Header */}
+        <header className="h-16 bg-white border-b border-neutral-200 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-20 shadow-2xs">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2 rounded-xl text-neutral-600 hover:bg-neutral-100"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Link
+              to="/report"
+              className="btn btn-primary btn-sm flex items-center gap-1.5 shadow-sm"
+            >
               <Plus className="w-4 h-4" />
+              <span>Report Issue</span>
             </Link>
-          ) : (
-            <div className="w-8" />
-          )}
+          </div>
         </header>
 
-        <main className="flex-1 p-4 lg:p-8 animate-fade-in max-w-7xl w-full mx-auto">
+        {/* Page Content */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
           {children}
         </main>
       </div>

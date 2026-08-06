@@ -1,23 +1,17 @@
-// client/src/layouts/AuthLayout.jsx
-import { Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import CityPulseLogo from '../components/shared/CityPulseLogo';
 
 export default function AuthLayout({ children }) {
   return (
     <div className="min-h-screen flex">
-      {/* Left panel — branding with rich indigo gradient */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-700 via-primary-700 to-indigo-900 relative overflow-hidden flex-col justify-between p-12 text-white">
+      {/* Left panel — branding with rich soft violet gradient */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#7C3AED] via-purple-700 to-violet-950 relative overflow-hidden flex-col justify-between p-12 text-white">
         <div className="absolute inset-0 opacity-20 pointer-events-none">
           <div className="absolute -top-24 -left-24 w-96 h-96 bg-white rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-emerald-400 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-purple-400 rounded-full blur-3xl" />
         </div>
         
-        <Link to="/" className="relative flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20 shadow-sm">
-            <Shield className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-xl font-display font-bold text-white tracking-tight">CityPulse AI</span>
-        </Link>
+        <CityPulseLogo size="lg" to="/" />
         
         <div className="relative z-10">
           <h2 className="text-4xl font-display font-extrabold text-white leading-tight mb-4">
