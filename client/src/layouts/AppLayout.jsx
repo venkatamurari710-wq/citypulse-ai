@@ -42,7 +42,6 @@ export default function AppLayout({ children }) {
 
   const officerNav = [
     { to: '/review-queue', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/review-queue?tab=needs_review', icon: ClipboardList, label: 'Review Queue' },
     { to: '/hotspots', icon: Flame, label: 'Hotspots' },
     { to: '/departments', icon: Building2, label: 'Departments' },
     { to: '/map', icon: Map, label: 'Map View' },
