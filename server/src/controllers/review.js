@@ -224,3 +224,121 @@ export async function mergeComplaint(req, res, next) {
     res.json({ message: 'Complaints merged successfully' });
   } catch (err) { next(err); }
 }
+
+export async function updateOfficerAction(req, res, next) {
+  try {
+    const { id } = req.params;
+    const isOfficer = req.user.role === 'officer';
+
+    // 1. Fetch complaint
+    const { data: complaint, error: fetchErr } = await supabase
+      .from('complaints')
+      .select('id, title, department_id, status, issue_category, created_at, user_id')
+      .eq('id', id)
+      .single();
+
+    if (fetchErr || !complaint) return next(createError(404, 'Complaint not found'));
+
+    // 2. Department Security Check
+    if (isOfficer) {
+      const officerDept = await getOfficerDepartmentInfo(req.user);
+      if (!officerDept?.department_id || complaint.department_id !== officerDept.department_id) {
+        return next(createError(403, 'Access denied: You can only manage complaints assigned to your department.'));
+      }
+    }
+
+    const {
+      status,
+      priority,
+      severity,
+      urgency,
+      eta,
+      internal_notes,
+      public_message,
+      resolution_summary,
+      action_type,
+    } = req.body;
+
+    // 3. Validation for Resolution
+    if (status === 'resolved' || status === 'completed' || action_type === 'mark_resolved') {
+      if (!resolution_summary || resolution_summary.trim() === '') {
+        return next(createError(400, 'Resolution summary is required to mark a complaint as resolved.'));
+      }
+    }
+
+    const newStatus = status || (action_type === 'mark_resolved' ? 'resolved' : action_type === 'mark_in_progress' ? 'in_progress' : action_type === 'reject' ? 'rejected' : complaint.status);
+
+    const updates = {
+      status: newStatus,
+      review_required: false,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (priority || severity) updates.severity = priority || severity;
+    if (urgency) updates.urgency = urgency;
+    if (resolution_summary) updates.ai_summary = resolution_summary;
+
+    // Process file uploads if work completion evidence attached
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const ext = file.originalname.split('.').pop()?.toLowerCase();
+        let fileType = 'image';
+        if (['mp4', 'mov', 'avi', 'mkv', 'webm'].includes(ext)) fileType = 'video';
+        else if (['pdf', 'doc', 'docx', 'txt'].includes(ext)) fileType = 'document';
+
+        await supabase.from('uploads').insert({
+          complaint_id: complaint.id,
+          user_id: req.user.id,
+          file_name: file.originalname,
+          file_type: fileType,
+          mime_type: file.mimetype,
+          file_size: file.size,
+          storage_path: file.path,
+        });
+      }
+    }
+
+    // 4. Update complaints table
+    const { data: updated, error: updateErr } = await supabase
+      .from('complaints')
+      .update(updates)
+      .eq('id', id)
+      .select('*, departments(id, name), uploads(*), complaint_updates(*)')
+      .single();
+
+    if (updateErr) return next(createError(500, updateErr.message));
+
+    // 5. Create timeline entry in complaint_updates
+    const formattedMessage = internal_notes
+      ? `Officer Note: ${internal_notes}`
+      : `Status updated to "${newStatus}" by Officer ${req.user.full_name || 'Officer'}`;
+
+    const defaultPublicMessage = newStatus === 'resolved'
+      ? `Issue has been resolved. ${resolution_summary || ''}`
+      : `Complaint status updated to ${newStatus.replace('_', ' ')}.`;
+
+    await supabase.from('complaint_updates').insert({
+      complaint_id: id,
+      updated_by: req.user.id,
+      status: newStatus,
+      message: formattedMessage,
+      public_message: public_message || defaultPublicMessage,
+      eta: eta ? (isNaN(Date.parse(eta)) ? null : new Date(eta).toISOString()) : null,
+    });
+
+    await logAudit({
+      user_id: req.user.id,
+      complaint_id: id,
+      action: 'officer_action_update',
+      metadata: { status: newStatus, action_type, resolution_summary },
+      ...getAuditMeta(req),
+    });
+
+    res.json({
+      message: newStatus === 'resolved' ? 'Complaint marked as resolved successfully!' : 'Officer action recorded successfully.',
+      complaint: updated,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
