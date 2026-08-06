@@ -1,10 +1,9 @@
 // client/src/components/landing/Navbar.jsx
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Shield, Menu, X, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../../contexts/ThemeContext';
-
 import CityPulseLogo from '../shared/CityPulseLogo';
 
 export default function Navbar() {
@@ -56,7 +55,7 @@ export default function Navbar() {
     <header
       className={`sticky top-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800 shadow-xs py-3.5'
+          ? 'bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-xs py-3.5'
           : 'bg-transparent border-b border-transparent py-5'
       }`}
     >
@@ -75,15 +74,15 @@ export default function Navbar() {
                 onClick={() => setActiveTab(item.name)}
                 className={`relative py-1 text-sm font-semibold transition-colors ${
                   isActive
-                    ? 'text-[#7C3AED] dark:text-violet-400 font-bold'
-                    : 'text-slate-700 dark:text-slate-300 hover:text-[#7C3AED] dark:hover:text-violet-400'
+                    ? 'text-[#1D4ED8] font-bold'
+                    : 'text-slate-700 hover:text-[#1D4ED8]'
                 }`}
               >
                 {item.name}
                 {isActive && (
                   <motion.div
                     layoutId="activeTabUnderline"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#7C3AED] dark:bg-violet-400 rounded-full"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#1D4ED8] rounded-full"
                   />
                 )}
               </Link>
@@ -94,15 +93,15 @@ export default function Navbar() {
                 onClick={(e) => handleNavClick(e, item)}
                 className={`relative py-1 text-sm font-semibold transition-colors ${
                   isActive
-                    ? 'text-[#7C3AED] dark:text-violet-400 font-bold'
-                    : 'text-slate-700 dark:text-slate-300 hover:text-[#7C3AED] dark:hover:text-violet-400'
+                    ? 'text-[#1D4ED8] font-bold'
+                    : 'text-slate-700 hover:text-[#1D4ED8]'
                 }`}
               >
                 {item.name}
                 {isActive && (
                   <motion.div
                     layoutId="activeTabUnderline"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#7C3AED] dark:bg-violet-400 rounded-full"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#1D4ED8] rounded-full"
                   />
                 )}
               </a>
@@ -110,48 +109,27 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Right CTA Buttons & Theme Toggle */}
+        {/* Right CTA Buttons */}
         <div className="hidden sm:flex items-center gap-3">
-          {/* Theme Toggle Button */}
-          <button
-            onClick={toggleTheme}
-            className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-2xs"
-            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            aria-label="Toggle Dark or Light Theme"
-          >
-            {theme === 'dark' ? (
-              <Sun className="w-4 h-4 text-amber-400" />
-            ) : (
-              <Moon className="w-4 h-4 text-slate-700" />
-            )}
-          </button>
-
           <Link
             to="/login"
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-[#7C3AED] dark:text-violet-400 bg-white dark:bg-slate-800 hover:bg-violet-50 dark:hover:bg-slate-700 border border-violet-200 dark:border-slate-700 hover:border-violet-300 transition-all duration-200 shadow-2xs"
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-[#0F2C59] bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all duration-200 shadow-xs"
           >
             Sign In
           </Link>
           <Link
             to="/register"
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#7C3AED] to-purple-600 hover:from-violet-700 hover:to-purple-700 shadow-md shadow-violet-500/25 hover:shadow-lg hover:shadow-violet-500/35 hover:-translate-y-0.5 transition-all duration-200"
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#1D4ED8] to-[#16A34A] hover:from-[#1E3A8A] hover:to-[#15803D] shadow-md shadow-blue-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
           >
             Get Started
           </Link>
         </div>
 
-        {/* Mobile menu & Theme toggle button */}
+        {/* Mobile Menu Button */}
         <div className="flex md:hidden items-center gap-2">
           <button
-            onClick={toggleTheme}
-            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-300 border border-slate-200 dark:border-slate-700"
-            title="Toggle Theme"
-          >
-            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
-          </button>
-          <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2.5 rounded-xl text-slate-700 dark:text-slate-200 hover:text-[#7C3AED] hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none transition-colors"
+            className="p-2.5 rounded-xl text-slate-700 hover:text-[#1D4ED8] hover:bg-slate-100 focus:outline-none transition-colors"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -176,7 +154,7 @@ export default function Navbar() {
                       key={item.name}
                       to={item.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="px-4 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:text-[#7C3AED] hover:bg-violet-50/60"
+                      className="px-4 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:text-[#1D4ED8] hover:bg-blue-50/60"
                     >
                       {item.name}
                     </Link>
@@ -185,7 +163,7 @@ export default function Navbar() {
                       key={item.name}
                       href={item.href}
                       onClick={(e) => handleNavClick(e, item)}
-                      className="px-4 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:text-[#7C3AED] hover:bg-violet-50/60"
+                      className="px-4 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:text-[#1D4ED8] hover:bg-blue-50/60"
                     >
                       {item.name}
                     </a>
@@ -196,14 +174,14 @@ export default function Navbar() {
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center px-4 py-2.5 rounded-xl font-semibold text-[#7C3AED] bg-violet-50 border border-violet-200"
+                  className="w-full text-center px-4 py-2.5 rounded-xl font-semibold text-[#0F2C59] bg-slate-50 border border-slate-200"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center px-4 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-[#7C3AED] to-purple-600 shadow-md"
+                  className="w-full text-center px-4 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-[#1D4ED8] to-[#16A34A] shadow-md"
                 >
                   Get Started / Create Account
                 </Link>
