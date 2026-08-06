@@ -8,45 +8,31 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Logo Civic Navy & Blue Palette (#0F2C59 / #1E3A8A)
+        // Rich Indigo-Blue Theme Palette matching reference UI (#4F46E5 / #3B82F6)
         primary: {
+          50:  '#eef2ff',
+          100: '#e0e7ff',
+          200: '#c7d2fe',
+          300: '#a5b4fc',
+          400: '#818cf8',
+          500: '#6366f1',
+          600: '#4f46e5', // Primary Indigo
+          700: '#4338ca',
+          800: '#3730a3',
+          900: '#312e81',
+          950: '#1e1b4b',
+        },
+        blue: {
           50:  '#eff6ff',
           100: '#dbeafe',
           200: '#bfdbfe',
           300: '#93c5fd',
           400: '#60a5fa',
-          500: '#2563eb',
-          600: '#1d4ed8',
-          700: '#1e40af',
-          800: '#1e3a8a', // Logo Deep Civic Blue #1E3A8A
-          900: '#0f2c59', // Logo Navy #0F2C59
-          950: '#0a192f',
-        },
-        // Logo Eco Green Palette (#16A34A / #15803D)
-        emerald: {
-          50:  '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a', // Logo Green
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
-        },
-        // Logo Circuit Amber/Orange Accent Palette (#EA580C)
-        amber: {
-          50:  '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c', // Logo Circuit Orange
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
+          500: '#3b82f6', // Vibrant Blue Accent
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
         },
         slate: {
           50:  '#f8fafc',
@@ -62,13 +48,29 @@ export default {
           950: '#020617',
         },
         accent: {
-          50:  '#f0fdf4',
-          500: '#16a34a',
-          600: '#15803d',
+          50:  '#eff6ff',
+          500: '#3b82f6',
+          600: '#2563eb',
         },
-        success: { 50: '#f0fdf4', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' },
-        warning: { 50: '#fff7ed', 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c' },
-        danger:  { 50: '#fef2f2', 400: '#f87171', 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c' },
+        emerald: {
+          50:  '#f0fdf4',
+          100: '#dcfce7',
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#4ade80',
+          500: '#22c55e',
+          600: '#16a34a',
+          700: '#15803d',
+        },
+        amber: {
+          50:  '#fffbeb',
+          100: '#fef3c7',
+          200: '#fde68a',
+          300: '#fcd34d',
+          400: '#fbbf24',
+          500: '#f59e0b',
+          600: '#d97706',
+        },
         neutral: {
           0:   '#ffffff',
           50:  '#f8fafc',
@@ -85,25 +87,26 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['Space Grotesk', 'Inter', 'sans-serif'],
-        grotesk: ['Space Grotesk', 'sans-serif'],
+        display: ['Outfit', 'Space Grotesk', 'Inter', 'sans-serif'],
+        grotesk: ['Outfit', 'Space Grotesk', 'sans-serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'hero-gradient': 'linear-gradient(135deg, #0F2C59 0%, #1E3A8A 50%, #16A34A 100%)',
-        'hero-badge': 'linear-gradient(135deg, rgba(15, 44, 89, 0.06) 0%, rgba(22, 163, 74, 0.06) 100%)',
-        'logo-glow': 'radial-gradient(ellipse at 50% 0%, rgba(30, 58, 138, 0.08) 0%, transparent 70%)',
-        'grid-pattern': "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M0 40h40M40 0v40' fill='none' stroke='%230f2c59' stroke-opacity='0.04' stroke-width='1'/%3E%3C/svg%3E\")",
+        'hero-gradient': 'linear-gradient(135deg, #4f46e5 0%, #3b82f6 50%, #2563eb 100%)',
+        'hero-badge': 'linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%)',
+        'indigo-glow': 'radial-gradient(ellipse at 50% 0%, rgba(79, 70, 229, 0.12) 0%, transparent 70%)',
+        'grid-pattern': "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M0 40h40M40 0v40' fill='none' stroke='%234f46e5' stroke-opacity='0.05' stroke-width='1'/%3E%3C/svg%3E\")",
       },
       boxShadow: {
+        '2xs': '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
         'xs': '0 1px 2px 0 rgba(0, 0, 0, 0.04)',
-        'card': '0 1px 3px rgba(15, 44, 89, 0.05), 0 1px 2px rgba(15, 44, 89, 0.03)',
-        'card-md': '0 4px 12px -2px rgba(15, 44, 89, 0.08), 0 2px 4px -2px rgba(15, 44, 89, 0.04)',
-        'card-lg': '0 12px 24px -4px rgba(15, 44, 89, 0.1), 0 4px 8px -4px rgba(15, 44, 89, 0.04)',
-        'card-hover': '0 12px 28px -5px rgba(30, 58, 138, 0.15), 0 4px 10px -6px rgba(15, 44, 89, 0.06)',
-        'glow-primary': '0 0 25px -5px rgba(30, 58, 138, 0.3)',
-        'glow-green': '0 0 25px -5px rgba(22, 163, 74, 0.3)',
-        'glow-sm': '0 0 0 2px rgba(30, 58, 138, 0.2)',
+        'card': '0 1px 3px rgba(79, 70, 229, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)',
+        'card-md': '0 4px 12px -2px rgba(79, 70, 229, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.04)',
+        'card-lg': '0 12px 24px -4px rgba(79, 70, 229, 0.12), 0 4px 8px -4px rgba(0, 0, 0, 0.04)',
+        'card-hover': '0 12px 30px -5px rgba(79, 70, 229, 0.2), 0 4px 12px -6px rgba(0, 0, 0, 0.08)',
+        'glow-primary': '0 0 30px -5px rgba(79, 70, 229, 0.45)',
+        'glow-blue': '0 0 25px -5px rgba(59, 130, 246, 0.4)',
+        'glow-sm': '0 0 0 2px rgba(79, 70, 229, 0.25)',
         'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.03)',
       },
       animation: {
@@ -125,8 +128,8 @@ export default {
           '50%': { transform: 'translateY(-10px)' },
         },
         pulseGlow: {
-          '0%, 100%': { opacity: '0.6', transform: 'scale(1)', filter: 'drop-shadow(0 0 15px rgba(30, 58, 138, 0.5))' },
-          '50%': { opacity: '1', transform: 'scale(1.06)', filter: 'drop-shadow(0 0 30px rgba(30, 58, 138, 0.8))' },
+          '0%, 100%': { opacity: '0.6', transform: 'scale(1)', filter: 'drop-shadow(0 0 15px rgba(79, 70, 229, 0.6))' },
+          '50%': { opacity: '1', transform: 'scale(1.06)', filter: 'drop-shadow(0 0 30px rgba(79, 70, 229, 0.9))' },
         },
       },
       borderRadius: {
