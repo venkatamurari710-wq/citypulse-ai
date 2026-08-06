@@ -27,11 +27,11 @@ export default function ComplaintsPage() {
       try {
         const params = { page, limit: LIMIT };
         if (status) params.status = status;
-        const res = await api.get('/complaints', { params });
+        const res = await api.get('/complaints/my', { params });
         setComplaints(res.data.complaints || []);
         setTotal(res.data.total || 0);
       } catch (err) {
-        console.error(err);
+        console.error('Failed to load complaints:', err);
       } finally {
         setLoading(false);
       }

@@ -18,20 +18,26 @@ export async function listComplaints(req, res, next) {
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const isCitizen = req.user.role === 'citizen';
     const isOfficer = req.user.role === 'officer';
-    const isAdmin = ['department_admin', 'super_admin'].includes(req.user.role);
 
-    if (isCitizen) {
+    let query = supabase
+      .from('complaints')
+      .select(`
+        id, title, description, address_text, latitude, longitude,
+        issue_category, issue_subcategory, severity, urgency, status,
+        duplicate_status, confidence, review_required, created_at, updated_at,
+        departments(id, name),
+        uploads(id, file_name, file_type, storage_path, mime_type)
+      `, { count: 'exact' });
+
+    if (isCitizen || req.path.includes('/my')) {
       query = query.eq('user_id', req.user.id);
     } else if (isOfficer) {
-      // Department officers can ONLY see complaints assigned to their own department
       if (req.user.department_id) {
         query = query.eq('department_id', req.user.department_id);
       } else {
-        // Review Officers without a specific department view items requiring review
-        query = query.or('review_required.eq.true,status.eq.needs_review');
+        query = query.is('department_id', null);
       }
     }
-    // Admins and Super Admins view all complaints across all departments
 
     if (status) query = query.eq('status', status);
     if (category) query = query.eq('issue_category', category);
@@ -42,7 +48,7 @@ export async function listComplaints(req, res, next) {
 
     if (error) return next(createError(500, error.message));
 
-    res.json({ complaints: data, total: count, page: parseInt(page), limit: parseInt(limit) });
+    res.json({ complaints: data || [], total: count || 0, page: parseInt(page), limit: parseInt(limit) });
   } catch (err) {
     next(err);
   }

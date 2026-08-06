@@ -8,8 +8,9 @@ import { upload } from '../middleware/upload.js';
 export const complaintRoutes = Router();
 
 complaintRoutes.use(authenticate);
-complaintRoutes.post('/predict-category', generalLimiter, predictCategory);
+complaintRoutes.get('/my', generalLimiter, listComplaints);
 complaintRoutes.get('/', generalLimiter, listComplaints);
+complaintRoutes.post('/predict-category', generalLimiter, predictCategory);
 complaintRoutes.post('/', aiLimiter, upload.array('files', 10), createComplaint);
 complaintRoutes.get('/:id', generalLimiter, getComplaint);
 complaintRoutes.put('/:id', generalLimiter, updateComplaint);

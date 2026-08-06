@@ -33,7 +33,7 @@ export default function DashboardPage() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await api.get('/complaints?limit=6');
+        const res = await api.get('/complaints/my?limit=6');
         const data = res.data.complaints || [];
         setComplaints(data);
         setStats({
