@@ -16,7 +16,10 @@ export default function ProfilePage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.put('/auth/profile', form);
+      const res = await api.put('/auth/profile', form);
+      if (res.data?.user) {
+        localStorage.setItem('citypulse_user', JSON.stringify(res.data.user));
+      }
       toast('Profile updated successfully!', 'success');
     } catch (err) {
       toast(err.response?.data?.error || 'Update failed', 'error');
