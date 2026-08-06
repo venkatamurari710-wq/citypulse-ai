@@ -2,9 +2,9 @@
 import axios from 'axios';
 
 function getApiBaseUrl() {
-  const envUrl = import.meta.env.VITE_API_URL;
+  const envUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
   if (!envUrl) return '/api';
-  
+
   let cleanUrl = envUrl.trim().replace(/\/+$/, '');
   if (!cleanUrl.endsWith('/api')) {
     cleanUrl = `${cleanUrl}/api`;
@@ -12,10 +12,18 @@ function getApiBaseUrl() {
   return cleanUrl;
 }
 
-const api = axios.create({
-  baseURL: getApiBaseUrl(),
-  headers: { 'Content-Type': 'application/json' },
+const baseURL = getApiBaseUrl();
+
+if (import.meta.env.DEV || import.meta.env.MODE === 'development') {
+  console.log('[CityPulse API] Initialized with baseURL:', baseURL);
+}
+
+export const api = axios.create({
+  baseURL,
   withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 // Request interceptor — attach JWT token

@@ -84,6 +84,8 @@ export default function RegisterPage() {
           if (d.field) fieldErrors[d.field] = d.message;
         });
         mainError = data.error ? `${data.error}: ${data.details.map(d => d.message).join(' | ')}` : data.details.map(d => d.message).join(' | ');
+      } else if (data?.message) {
+        mainError = data.message;
       } else if (data?.error) {
         mainError = data.error;
       } else if (typeof data?.details === 'string') {
