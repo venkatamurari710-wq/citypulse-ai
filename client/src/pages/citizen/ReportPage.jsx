@@ -73,17 +73,58 @@ export default function ReportPage() {
   const getLocation = useCallback(() => {
     if (!navigator.geolocation) return toast('Geolocation not supported', 'error');
     setLocating(true);
+
     navigator.geolocation.getCurrentPosition(
-      pos => {
+      async (pos) => {
+        const lat = pos.coords.latitude.toFixed(7);
+        const lon = pos.coords.longitude.toFixed(7);
+
+        let reverseAddress = '';
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`,
+            { headers: { 'Accept-Language': 'en' } }
+          );
+          if (response.ok) {
+            const data = await response.json();
+            if (data?.display_name) {
+              reverseAddress = data.display_name;
+            } else if (data?.address) {
+              const a = data.address;
+              const parts = [
+                a.road || a.pedestrian || a.suburb,
+                a.neighbourhood || a.residential,
+                a.city || a.town || a.village || a.county,
+                a.state,
+                a.postcode,
+              ].filter(Boolean);
+              reverseAddress = parts.join(', ');
+            }
+          }
+        } catch (err) {
+          console.warn('Reverse geocoding failed:', err);
+        }
+
         setForm(p => ({
           ...p,
-          latitude: pos.coords.latitude.toFixed(7),
-          longitude: pos.coords.longitude.toFixed(7),
+          latitude: lat,
+          longitude: lon,
+          address_text: reverseAddress || p.address_text || `${lat}, ${lon}`,
         }));
-        toast('Location captured!', 'success');
+
+        if (reverseAddress) {
+          toast('Location & address captured successfully!', 'success');
+        } else {
+          toast('GPS location captured! Please verify address.', 'info');
+        }
         setLocating(false);
       },
-      () => { toast('Could not get location. Please enter manually.', 'warning'); setLocating(false); }
+      () => {
+        toast('Could not get location. Please enter address manually.', 'warning');
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   }, [toast]);
 
