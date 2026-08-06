@@ -175,6 +175,16 @@ export async function createComplaint(req, res, next) {
           review_required: true,
         };
 
+    const assignedDeptName = triageResult?.routing?.department_name || fallbackRouting?.department_name || 'Municipal Complaint Review Unit';
+
+    console.log('📌 [COMPLAINT SUBMISSION SAVING OBJECT]:', {
+      category: aiUpdate.issue_category,
+      assignedDepartment: assignedDeptName,
+      department_id: aiUpdate.department_id,
+      status: aiUpdate.status,
+      citizenId: req.user.id,
+    });
+
     const { data: updatedComplaint } = await supabase
       .from('complaints')
       .update(aiUpdate)

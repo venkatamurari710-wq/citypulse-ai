@@ -3,7 +3,7 @@ import { supabase } from '../config/supabase.js';
 import { reviewAssignSchema, reviewOverrideSchema, reviewMergeSchema } from '../validators/index.js';
 import { createError } from '../middleware/errorHandler.js';
 import { logAudit, getAuditMeta } from '../services/audit.js';
-import { resolveOfficerDepartmentId } from '../services/officerHelper.js';
+import { getOfficerDepartmentInfo } from '../services/officerRegistry.js';
 
 export async function getReviewQueue(req, res, next) {
   return getOfficerDashboard(req, res, next);
@@ -12,21 +12,15 @@ export async function getReviewQueue(req, res, next) {
 export async function getOfficerDashboard(req, res, next) {
   try {
     const isOfficer = req.user.role === 'officer';
-    let deptId = await resolveOfficerDepartmentId(req.user);
+    let deptInfo = null;
 
-    if (isOfficer && !deptId) {
-      return res.json({
-        departmentName: 'No Department Assigned',
-        totalComplaints: 0,
-        activeComplaints: 0,
-        pendingReview: 0,
-        resolvedComplaints: 0,
-        complaints: [],
-        totalFiltered: 0,
-        page: 1,
-        limit: 15,
-      });
+    if (isOfficer) {
+      deptInfo = await getOfficerDepartmentInfo(req.user);
+      console.log(`Officer Department: ${deptInfo?.department_name}`);
     }
+
+    const deptId = deptInfo?.department_id || null;
+    const departmentName = deptInfo?.department_name || (isOfficer ? 'General Review Queue' : 'All Departments');
 
     const { page = 1, limit = 15, filter = 'needs_review' } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
@@ -87,21 +81,22 @@ export async function getOfficerDashboard(req, res, next) {
     const activeComplaints = activeRes?.count || 0;
     const pendingReview = pendingRes?.count || 0;
     const resolvedComplaints = resolvedRes?.count || 0;
-    const complaintsData = complaintsRes?.data || [];
-    const totalFiltered = complaintsRes?.count || complaintsData.length;
+    const complaintsRaw = complaintsRes?.data || [];
+    const totalFiltered = complaintsRes?.count || complaintsRaw.length;
 
-    let departmentName = null;
-    if (deptId) {
-      try {
-        const { data: dept } = await supabase.from('departments').select('name').eq('id', deptId).maybeSingle();
-        if (dept) departmentName = dept.name;
-      } catch (e) {
-        // Ignore department lookup error
-      }
-    }
+    const complaintsData = complaintsRaw.map(c => ({
+      ...c,
+      assignedDepartment: c.departments?.name || departmentName,
+      departmentName: c.departments?.name || departmentName,
+    }));
+
+    console.log(`📌 [OFFICER DASHBOARD QUERY SUCCESS]:`);
+    console.log(`  ├─ Officer Department: "${departmentName}"`);
+    console.log(`  ├─ Supabase Query: SELECT * FROM complaints WHERE department_id = "${deptId}"`);
+    console.log(`  └─ Complaints Returned: ${complaintsData.length}`);
 
     res.json({
-      departmentName: departmentName || (isOfficer ? 'General Review Queue' : 'All Departments'),
+      departmentName,
       totalComplaints,
       activeComplaints,
       pendingReview,

@@ -6,6 +6,8 @@ import { registerSchema, loginSchema } from '../validators/index.js';
 import { logAudit, getAuditMeta } from '../services/audit.js';
 import { createError } from '../middleware/errorHandler.js';
 
+import { getOfficerDepartmentInfo, registerOfficerDepartment } from '../services/officerRegistry.js';
+
 export async function register(req, res, next) {
   try {
     const data = registerSchema.parse(req.body);
@@ -13,7 +15,6 @@ export async function register(req, res, next) {
     const isPrivileged = ['officer', 'department_admin'].includes(targetRole);
     const cleanEmail = data.email.trim().toLowerCase();
 
-    // Check existing user by email
     const { data: existingEmail } = await supabase
       .from('users')
       .select('id')
@@ -22,17 +23,6 @@ export async function register(req, res, next) {
 
     if (existingEmail) return next(createError(409, 'Email already registered'));
 
-    // Check existing Govt ID if officer or admin
-    if (isPrivileged && data.govt_id) {
-      const { data: existingGovtId } = await supabase
-        .from('users')
-        .select('id')
-        .eq('govt_id', data.govt_id.trim())
-        .maybeSingle();
-      if (existingGovtId) return next(createError(409, 'Government ID / Badge # already registered'));
-    }
-
-    // Hash password
     const password_hash = await bcrypt.hash(data.password, 12);
 
     let deptId = targetRole === 'officer' && data.department_id ? data.department_id : null;
@@ -57,61 +47,36 @@ export async function register(req, res, next) {
       phone: data.phone || null,
       password_hash,
       role: targetRole,
-      govt_id: isPrivileged ? (data.govt_id.trim() || null) : null,
-      department_id: deptId,
       preferred_language: data.preferred_language || 'en',
     };
 
-    let user = null;
-    let error = null;
-
-    const dbRes = await supabase
+    const { data: user, error } = await supabase
       .from('users')
       .insert(insertPayload)
-      .select('id, full_name, email, role, phone, department_id, preferred_language, created_at')
+      .select('id, full_name, email, role, phone, preferred_language, created_at')
       .single();
-
-    user = dbRes.data;
-    error = dbRes.error;
-
-    if (error && error.message?.includes('schema cache')) {
-      delete insertPayload.govt_id;
-      delete insertPayload.department_id;
-
-      const fallbackRes = await supabase
-        .from('users')
-        .insert(insertPayload)
-        .select('id, full_name, email, role, phone, preferred_language, created_at')
-        .single();
-
-      user = fallbackRes.data;
-      error = fallbackRes.error;
-    }
 
     if (error) {
       console.error('[AUTH REGISTER ERROR]:', error.message);
       return next(createError(500, error.message));
     }
 
-    if (targetRole === 'officer' && deptId && user?.id) {
-      try {
-        await supabase.from('department_officers').insert({
-          user_id: user.id,
-          department_id: deptId,
-          officer_title: `${deptName || 'Department'} Officer`,
-          active: true,
-        });
-      } catch (e) {
-        console.warn('Failed to insert into department_officers table:', e.message);
-      }
+    let officerDeptInfo = null;
+    if (targetRole === 'officer') {
+      officerDeptInfo = await getOfficerDepartmentInfo({ ...user, department_id: deptId, department_name: deptName });
+      registerOfficerDepartment(user.id, user.email, officerDeptInfo.department_id, officerDeptInfo.department_name);
+      console.log(`Officer Department: ${officerDeptInfo.department_name}`);
     }
 
-    const token = generateToken(user);
-    await logAudit({ user_id: user.id, action: 'user_registered', metadata: { email: user.email, role: user.role, govt_id: user.govt_id }, ...getAuditMeta(req) });
+    const tokenPayload = { ...user, department_id: officerDeptInfo?.department_id || null };
+    const token = generateToken(tokenPayload);
+
+    await logAudit({ user_id: user.id, action: 'user_registered', metadata: { email: user.email, role: user.role }, ...getAuditMeta(req) });
 
     const safeUser = {
       ...user,
-      assignedDepartment: deptName || (user?.role === 'officer' ? 'Not Assigned' : null),
+      department_id: officerDeptInfo?.department_id || null,
+      assignedDepartment: officerDeptInfo?.department_name || null,
     };
 
     console.log(`[AUTH REGISTER SUCCESS] User registered: ${user.email} (${user.role})`);
@@ -126,7 +91,6 @@ export async function login(req, res, next) {
     const data = loginSchema.parse(req.body);
     const cleanEmail = data.email.trim().toLowerCase();
 
-    // 1. Fetch user by email safely without PostgREST relation joins
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
@@ -148,14 +112,12 @@ export async function login(req, res, next) {
       return next(createError(403, 'Account is disabled'));
     }
 
-    // 2. Compare password hash
     const valid = await bcrypt.compare(data.password, user.password_hash);
     if (!valid) {
       console.warn(`[AUTH LOGIN FAIL] Password mismatch for: "${cleanEmail}"`);
       return next(createError(401, 'Invalid email or password'));
     }
 
-    // 3. Optional Role validation with helpful tab guidance
     if (data.role) {
       if (data.role === 'officer' && user.role !== 'officer') {
         return next(createError(403, `This account (${user.email}) is registered as a Citizen. Please switch to the Citizen tab to sign in.`));
@@ -163,41 +125,20 @@ export async function login(req, res, next) {
       if (data.role === 'citizen' && user.role === 'officer') {
         return next(createError(403, `This account (${user.email}) is registered as an Officer. Please switch to the Officer tab to sign in.`));
       }
-      if (data.role === 'department_admin' && !['department_admin', 'super_admin'].includes(user.role)) {
-        return next(createError(403, `This account (${user.email}) is registered as a ${user.role}. Please use the matching sign-in tab.`));
-      }
     }
 
-    // 4. Resolve assignedDepartment safely
-    let assignedDeptName = null;
-    if (user.department_id) {
-      const { data: dept } = await supabase
-        .from('departments')
-        .select('name')
-        .eq('id', user.department_id)
-        .maybeSingle();
-      if (dept) assignedDeptName = dept.name;
+    let officerDeptInfo = null;
+    if (user.role === 'officer') {
+      officerDeptInfo = await getOfficerDepartmentInfo(user);
+      console.log(`Officer Department: ${officerDeptInfo.department_name}`);
     }
 
-    if (!assignedDeptName && user.role === 'officer') {
-      const { data: deptOfficer } = await supabase
-        .from('department_officers')
-        .select('department_id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (deptOfficer?.department_id) {
-        const { data: dept } = await supabase
-          .from('departments')
-          .select('name')
-          .eq('id', deptOfficer.department_id)
-          .maybeSingle();
-        if (dept) assignedDeptName = dept.name;
-      }
-    }
+    const tokenPayload = { ...user, department_id: officerDeptInfo?.department_id || user.department_id || null };
+    const token = generateToken(tokenPayload);
 
-    const token = generateToken(user);
     const { password_hash, ...safeUser } = user;
-    safeUser.assignedDepartment = assignedDeptName || (user.role === 'officer' ? 'Not Assigned' : null);
+    safeUser.department_id = officerDeptInfo?.department_id || user.department_id || null;
+    safeUser.assignedDepartment = officerDeptInfo?.department_name || null;
 
     console.log(`[AUTH LOGIN SUCCESS] User logged in: ${user.email} (${user.role})`);
     await logAudit({ user_id: user.id, action: 'user_login', metadata: { role: user.role }, ...getAuditMeta(req) });
@@ -221,36 +162,16 @@ export async function getMe(req, res, next) {
       return next(createError(401, 'Invalid or expired authentication session'));
     }
 
-    let assignedDeptName = null;
-    if (user.department_id) {
-      const { data: dept } = await supabase
-        .from('departments')
-        .select('name')
-        .eq('id', user.department_id)
-        .maybeSingle();
-      if (dept) assignedDeptName = dept.name;
-    }
-
-    if (!assignedDeptName && user.role === 'officer') {
-      const { data: deptOfficer } = await supabase
-        .from('department_officers')
-        .select('department_id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (deptOfficer?.department_id) {
-        const { data: dept } = await supabase
-          .from('departments')
-          .select('name')
-          .eq('id', deptOfficer.department_id)
-          .maybeSingle();
-        if (dept) assignedDeptName = dept.name;
-      }
+    let officerDeptInfo = null;
+    if (user.role === 'officer') {
+      officerDeptInfo = await getOfficerDepartmentInfo(user);
     }
 
     const safeUser = {
       ...user,
       fullName: user.full_name,
-      assignedDepartment: assignedDeptName || (user.role === 'officer' ? 'Not Assigned' : null),
+      department_id: officerDeptInfo?.department_id || user.department_id || null,
+      assignedDepartment: officerDeptInfo?.department_name || null,
     };
     res.json({ user: safeUser });
   } catch (err) {
