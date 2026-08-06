@@ -353,3 +353,44 @@ export async function closeComplaint(req, res, next) {
     next(err);
   }
 }
+
+export async function predictCategory(req, res, next) {
+  try {
+    const { title = '', description = '' } = req.body;
+    const text = `${title} ${description}`.toLowerCase();
+
+    let category = 'roads_and_potholes';
+    let confidence = 0.85;
+    let label = 'Potholes & Road Damage';
+
+    if (/drain|drainage|clog|gutter|culvert|overflowing/i.test(text)) {
+      category = 'drainage_blockage';
+      label = 'Drainage Blockage';
+      confidence = 0.92;
+    } else if (/pothole|road damage|crater|asphalt|pit/i.test(text)) {
+      category = 'roads_and_potholes';
+      label = 'Potholes & Road Damage';
+      confidence = 0.94;
+    } else if (/street light|streetlight|lamp post|light pole|dark street/i.test(text)) {
+      category = 'streetlight_failure';
+      label = 'Street Lights';
+      confidence = 0.95;
+    } else if (/garbage|trash|waste|rubbish|dustbin/i.test(text)) {
+      category = 'garbage_and_sanitation';
+      label = 'Garbage Collection';
+      confidence = 0.90;
+    } else if (/water leak|leaking water|pipe burst|water supply|tap leak/i.test(text)) {
+      category = 'water_leakage';
+      label = 'Water Supply';
+      confidence = 0.93;
+    } else if (/sewage|manhole|sewer|septic|wastewater/i.test(text)) {
+      category = 'sewage_overflow';
+      label = 'Sewage';
+      confidence = 0.88;
+    }
+
+    res.json({ category, confidence, label });
+  } catch (err) {
+    next(err);
+  }
+}

@@ -1,10 +1,10 @@
-// client/src/pages/citizen/ReportPage.jsx — Multimodal Complaint Submission (Light Theme)
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
+import { MapPin, Loader2, AlertTriangle, CheckCircle, Sparkles } from 'lucide-react';
 import api from '../../services/api';
 import { useToast } from '../../contexts/ToastContext';
 import FileUploadZone from '../../components/complaint/FileUploadZone';
+import { detectCategory } from '../../services/categoryDetector';
 
 const CATEGORIES = [
   { value: 'roads_and_potholes', label: '🛣 Roads & Potholes' },
@@ -41,9 +41,38 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(false);
   const [locating, setLocating] = useState(false);
   const [errors, setErrors] = useState({});
+  
+  // AI Category Detection State
+  const [aiPrediction, setAiPrediction] = useState({ category: null, label: null, confidence: 0 });
+  const [isManuallySet, setIsManuallySet] = useState(false);
+
+  // Debounced AI Category Detection (500ms)
+  useEffect(() => {
+    if (!form.title.trim() && !form.description.trim()) {
+      setAiPrediction({ category: null, label: null, confidence: 0 });
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      const res = await detectCategory(form.title, form.description);
+      setAiPrediction(res);
+
+      // Automatically pre-select category if confidence >= 70% and user has not manually overridden
+      if (res.confidence >= 0.70 && res.category) {
+        if (!isManuallySet) {
+          setForm(p => ({ ...p, category_hint: res.category }));
+        }
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [form.title, form.description, isManuallySet]);
 
   const set = (field) => (e) => {
     const val = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    if (field === 'category_hint') {
+      setIsManuallySet(true);
+    }
     setForm(p => ({ ...p, [field]: val }));
   };
 
@@ -140,12 +169,32 @@ export default function ReportPage() {
             </div>
           </div>
 
-          <div className="form-field">
-            <label htmlFor="category_hint">Category Hint (optional)</label>
+          <div className="form-field space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label htmlFor="category_hint">Category Hint (optional)</label>
+              {aiPrediction.category && (
+                <span className="text-[11px] font-bold text-primary-700 bg-primary-50 px-2 py-0.5 rounded-full border border-primary-200/60 flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-primary-600 animate-spin" style={{ animationDuration: '4s' }} /> AI Active
+                </span>
+              )}
+            </div>
             <select id="category_hint" value={form.category_hint} onChange={set('category_hint')}>
               <option value="">Let AI decide automatically</option>
               {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
+            {aiPrediction.category && aiPrediction.label && (
+              <p className="text-xs font-semibold text-primary-800 bg-primary-50/80 border border-primary-200/80 rounded-xl p-2.5 flex items-center justify-between animate-fade-in">
+                <span className="flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-primary-600 shrink-0" />
+                  AI detected: <strong className="text-primary-950 font-bold">{aiPrediction.label}</strong> ({Math.round(aiPrediction.confidence * 100)}% confidence)
+                </span>
+                {isManuallySet && (
+                  <span className="text-neutral-500 font-medium text-[11px] bg-white px-2 py-0.5 rounded-md border border-neutral-200">
+                    Manually overridden
+                  </span>
+                )}
+              </p>
+            )}
           </div>
 
           <div className="flex items-start gap-3 pt-2">

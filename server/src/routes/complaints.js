@@ -1,6 +1,6 @@
 // server/src/routes/complaints.js
 import { Router } from 'express';
-import { listComplaints, createComplaint, getComplaint, updateComplaint, reanalyzeComplaint, closeComplaint } from '../controllers/complaints.js';
+import { listComplaints, createComplaint, getComplaint, updateComplaint, reanalyzeComplaint, closeComplaint, predictCategory } from '../controllers/complaints.js';
 import { authenticate } from '../middleware/auth.js';
 import { aiLimiter, generalLimiter } from '../middleware/rateLimiter.js';
 import { upload } from '../middleware/upload.js';
@@ -8,6 +8,7 @@ import { upload } from '../middleware/upload.js';
 export const complaintRoutes = Router();
 
 complaintRoutes.use(authenticate);
+complaintRoutes.post('/predict-category', generalLimiter, predictCategory);
 complaintRoutes.get('/', generalLimiter, listComplaints);
 complaintRoutes.post('/', aiLimiter, upload.array('files', 10), createComplaint);
 complaintRoutes.get('/:id', generalLimiter, getComplaint);
