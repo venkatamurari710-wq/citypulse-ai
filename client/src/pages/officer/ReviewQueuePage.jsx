@@ -1,5 +1,5 @@
 // client/src/pages/officer/ReviewQueuePage.jsx — Dynamic Officer Complaint Management Dashboard
-import { useState, useEffect, useCallback } from 'react';
+import React, { Component, useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   ClipboardList, Search, ArrowRight, Shield, CheckCircle,
@@ -32,6 +32,8 @@ function StatCard({ icon: Icon, label, value, color, active, onClick }) {
       <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">{label}</div>
     </button>
   );
+}
+
 class OfficerErrorBoundary extends Component {
   constructor(props) {
     super(props);
