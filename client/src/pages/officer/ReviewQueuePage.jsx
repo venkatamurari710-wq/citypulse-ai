@@ -112,9 +112,16 @@ export default function ReviewQueuePage() {
       {/* Top Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="page-title">Officer Complaint Management Dashboard</h1>
-          <p className="text-neutral-500 text-sm mt-1 font-medium">
-            Monitor, assign, review, and resolve municipal complaints in real time
+          <div className="flex items-center gap-2.5 mb-1">
+            <h1 className="page-title">Officer Dashboard</h1>
+            {summary.departmentName && (
+              <span className="badge bg-primary-50 text-primary-800 border-primary-200 font-bold px-2.5 py-1 text-xs rounded-lg">
+                🏛 {summary.departmentName}
+              </span>
+            )}
+          </div>
+          <p className="text-neutral-500 text-sm font-medium">
+            Monitoring & managing complaints strictly assigned to {summary.departmentName || 'your department'}
           </p>
         </div>
         <div className="flex items-center gap-2">

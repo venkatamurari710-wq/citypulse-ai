@@ -9,7 +9,6 @@ export async function getReviewQueue(req, res, next) {
     const { page = 1, limit = 20, status, filter } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const isOfficer = req.user.role === 'officer';
-    const deptId = isOfficer && req.user.department_id ? req.user.department_id : null;
 
     let query = supabase
       .from('complaints')
@@ -22,8 +21,13 @@ export async function getReviewQueue(req, res, next) {
         uploads(id, file_type)
       `, { count: 'exact' });
 
-    if (deptId) {
-      query = query.eq('department_id', deptId);
+    // Strict Department Scoping for Officers
+    if (isOfficer) {
+      if (req.user.department_id) {
+        query = query.eq('department_id', req.user.department_id);
+      } else {
+        query = query.is('department_id', null);
+      }
     }
 
     if (filter === 'active') {
@@ -50,7 +54,7 @@ export async function getReviewQueue(req, res, next) {
 export async function getOfficerDashboard(req, res, next) {
   try {
     const isOfficer = req.user.role === 'officer';
-    const deptId = isOfficer && req.user.department_id ? req.user.department_id : null;
+    const deptId = isOfficer ? (req.user.department_id || '00000000-0000-0000-0000-000000000000') : null;
 
     let totalQuery = supabase.from('complaints').select('id', { count: 'exact', head: true });
     let activeQuery = supabase.from('complaints').select('id', { count: 'exact', head: true }).in('status', ['assigned', 'in_progress', 'analyzing']);
@@ -89,7 +93,14 @@ export async function getOfficerDashboard(req, res, next) {
       recentQuery
     ]);
 
+    let departmentName = null;
+    if (deptId && deptId !== '00000000-0000-0000-0000-000000000000') {
+      const { data: dept } = await supabase.from('departments').select('name').eq('id', deptId).single();
+      if (dept) departmentName = dept.name;
+    }
+
     res.json({
+      departmentName: departmentName || (isOfficer ? 'Unassigned Department' : 'All Departments'),
       totalComplaints: totalComplaints || 0,
       activeComplaints: activeComplaints || 0,
       pendingReview: pendingReview || 0,
