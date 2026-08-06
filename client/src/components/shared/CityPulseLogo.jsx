@@ -1,4 +1,4 @@
-// client/src/components/shared/CityPulseLogo.jsx — CityPulse AI Branding Logo Component
+// client/src/components/shared/CityPulseLogo.jsx — Clean Balloon Pin Logo Component
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -18,18 +18,16 @@ export default function CityPulseLogo({ className = '', size = 'md', showText = 
   };
 
   const content = (
-    <div className={`inline-flex items-center gap-3 group ${className}`}>
-      <div className={`${sizeClasses[size] || 'w-10 h-10'} rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-1 flex items-center justify-center shadow-sm overflow-hidden group-hover:scale-105 transition-transform duration-200`}>
-        <img
-          src="/logo.png"
-          alt="CityPulse AI Logo"
-          className="w-full h-full object-contain"
-          onError={(e) => {
-            // Fallback if image fails
-            e.currentTarget.style.display = 'none';
-          }}
-        />
-      </div>
+    <div className={`inline-flex items-center gap-2.5 group ${className}`}>
+      {/* Balloon Pin Logo Image — Transparent, no background box */}
+      <img
+        src="/logo.png"
+        alt="CityPulse AI Logo"
+        className={`${sizeClasses[size] || 'w-10 h-10'} object-contain shrink-0 group-hover:scale-105 transition-transform duration-200`}
+        onError={(e) => {
+          e.currentTarget.style.display = 'none';
+        }}
+      />
       {showText && (
         <span className={`font-grotesk font-extrabold tracking-tight text-[#111827] dark:text-white flex items-center gap-1 ${textSizes[size] || 'text-2xl'}`}>
           CityPulse <span className="bg-gradient-to-r from-[#7C3AED] via-purple-600 to-violet-500 bg-clip-text text-transparent">AI</span>
