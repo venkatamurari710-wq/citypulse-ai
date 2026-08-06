@@ -12,6 +12,8 @@ import { getFileType } from '../middleware/upload.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+import { resolveOfficerDepartmentId } from '../services/officerHelper.js';
+
 export async function listComplaints(req, res, next) {
   try {
     const { page = 1, limit = 20, status, category } = req.query;
@@ -32,11 +34,11 @@ export async function listComplaints(req, res, next) {
     if (isCitizen || req.path.includes('/my')) {
       query = query.eq('user_id', req.user.id);
     } else if (isOfficer) {
-      if (req.user.department_id) {
-        query = query.eq('department_id', req.user.department_id);
-      } else {
-        query = query.is('department_id', null);
+      const officerDeptId = await resolveOfficerDepartmentId(req.user);
+      if (!officerDeptId) {
+        return res.json({ complaints: [], total: 0, page: parseInt(page), limit: parseInt(limit) });
       }
+      query = query.eq('department_id', officerDeptId);
     }
 
     if (status) query = query.eq('status', status);
@@ -251,6 +253,13 @@ export async function getComplaint(req, res, next) {
     if (error || !complaint) return next(createError(404, 'Complaint not found'));
     if (!isOfficer && complaint.user_id !== req.user.id) return next(createError(403, 'Access denied'));
 
+    if (req.user.role === 'officer') {
+      const officerDeptId = await resolveOfficerDepartmentId(req.user);
+      if (!officerDeptId || complaint.department_id !== officerDeptId) {
+        return next(createError(403, 'Access denied: This complaint is assigned to another department'));
+      }
+    }
+
     res.json({ complaint });
   } catch (err) {
     next(err);
@@ -262,9 +271,16 @@ export async function updateComplaint(req, res, next) {
     const { id } = req.params;
     const isOfficer = ['officer', 'department_admin', 'super_admin'].includes(req.user.role);
 
-    const { data: existing } = await supabase.from('complaints').select('user_id, status').eq('id', id).single();
+    const { data: existing } = await supabase.from('complaints').select('user_id, status, department_id').eq('id', id).single();
     if (!existing) return next(createError(404, 'Complaint not found'));
     if (!isOfficer && existing.user_id !== req.user.id) return next(createError(403, 'Access denied'));
+
+    if (req.user.role === 'officer') {
+      const officerDeptId = await resolveOfficerDepartmentId(req.user);
+      if (!officerDeptId || existing.department_id !== officerDeptId) {
+        return next(createError(403, 'Access denied: This complaint is assigned to another department'));
+      }
+    }
 
     const validated = complaintUpdateSchema.parse(req.body);
     const { data: updated, error } = await supabase

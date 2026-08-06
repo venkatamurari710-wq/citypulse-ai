@@ -43,7 +43,7 @@ export function optionalAuth(req, res, next) {
 
 export function generateToken(user) {
   return jwt.sign(
-    { id: user.id, email: user.email, role: user.role, full_name: user.full_name },
+    { id: user.id, email: user.email, role: user.role, full_name: user.full_name, department_id: user.department_id || null },
     env.JWT_SECRET,
     { expiresIn: env.JWT_EXPIRES_IN }
   );

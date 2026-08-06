@@ -96,10 +96,15 @@ app.use(errorHandler);
 
 let currentPort = env.PORT || 5000;
 
+import { migrateComplaintsRouting } from './src/scripts/migrateComplaintsRouting.js';
+
 function startServer(portToTry) {
   const server = app.listen(portToTry, () => {
     console.log(`🚀 CityPulse AI server running on port ${portToTry} [${env.NODE_ENV}]`);
     console.log(`   Health check: http://localhost:${portToTry}/api/health`);
+    
+    // Auto-run routing migration on boot
+    migrateComplaintsRouting().catch(err => console.error('[BOOT MIGRATION ERROR]:', err));
   });
 
   server.on('error', (err) => {

@@ -3,6 +3,7 @@ import { supabase } from '../config/supabase.js';
 import { reviewAssignSchema, reviewOverrideSchema, reviewMergeSchema } from '../validators/index.js';
 import { createError } from '../middleware/errorHandler.js';
 import { logAudit, getAuditMeta } from '../services/audit.js';
+import { resolveOfficerDepartmentId } from '../services/officerHelper.js';
 
 export async function getReviewQueue(req, res, next) {
   return getOfficerDashboard(req, res, next);
@@ -11,52 +12,29 @@ export async function getReviewQueue(req, res, next) {
 export async function getOfficerDashboard(req, res, next) {
   try {
     const isOfficer = req.user.role === 'officer';
-    let deptId = req.user.department_id || null;
+    let deptId = await resolveOfficerDepartmentId(req.user);
 
-    // Safely resolve department_id for officer without throwing schema errors
     if (isOfficer && !deptId) {
-      try {
-        const { data: userRec, error: userErr } = await supabase
-          .from('users')
-          .select('id, department_id')
-          .eq('id', req.user.id)
-          .maybeSingle();
-
-        if (!userErr && userRec?.department_id) {
-          deptId = userRec.department_id;
-        }
-      } catch (e) {
-        // Ignore column missing error
-      }
-
-      if (!deptId) {
-        try {
-          const { data: deptOfficer, error: linkErr } = await supabase
-            .from('department_officers')
-            .select('department_id')
-            .eq('user_id', req.user.id)
-            .maybeSingle();
-
-          if (!linkErr && deptOfficer?.department_id) {
-            deptId = deptOfficer.department_id;
-          }
-        } catch (e) {
-          // Ignore missing table error
-        }
-      }
+      return res.json({
+        departmentName: 'No Department Assigned',
+        totalComplaints: 0,
+        activeComplaints: 0,
+        pendingReview: 0,
+        resolvedComplaints: 0,
+        complaints: [],
+        totalFiltered: 0,
+        page: 1,
+        limit: 15,
+      });
     }
 
     const { page = 1, limit = 15, filter = 'needs_review' } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
-    // Apply department scoping filter
+    // Apply strict department scoping filter in backend DB query
     const applyDeptFilter = (query) => {
-      if (isOfficer) {
-        if (deptId) {
-          return query.eq('department_id', deptId);
-        } else {
-          return query.or('department_id.is.null,review_required.eq.true,status.eq.needs_review');
-        }
+      if (isOfficer && deptId) {
+        return query.eq('department_id', deptId);
       }
       return query;
     };
