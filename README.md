@@ -1,266 +1,281 @@
-# CityPulse AI — Civic Intelligence Platform
+# AI Civic Intelligence Platform
 
-A production-grade, AI-powered civic complaint management platform that autonomously understands, deduplicates, prioritizes, routes, and tracks citizen complaints using Google Gemini multimodal AI.
+AI Civic Intelligence Platform is an AI-powered civic complaint management system that helps citizens report public issues using text, images, videos, voice notes, and GPS location. The platform automatically classifies complaints, detects duplicates, routes issues to the correct department or officer, prioritizes urgent cases, and provides transparent status tracking for both citizens and administrators.
 
-![CityPulse AI](https://img.shields.io/badge/Status-Production%20Ready-green?style=for-the-badge)
-![Stack](https://img.shields.io/badge/Stack-React%20%7C%20Node.js%20%7C%20Supabase%20%7C%20Gemini-blue?style=for-the-badge)
+## Table of Contents
 
----
+- [Overview](#overview)
+- [Problem Statement](#problem-statement)
+- [Proposed Solution](#proposed-solution)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Folder Structure](#folder-structure)
+- [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [Database Setup](#database-setup)
+- [Running the Project](#running-the-project)
+- [Usage](#usage)
+- [API Endpoints](#api-endpoints)
+- [Deployment](#deployment)
+- [Screenshots](#screenshots)
+- [Submission Requirements](#submission-requirements)
+- [Future Improvements](#future-improvements)
+- [Contributing](#contributing)
+- [License](#license)
 
-## ✨ Features
+## Overview
 
-- **Multimodal AI Triage** — Gemini 1.5 Flash analyzes text, images, audio, and video to classify civic issues
-- **Duplicate Detection** — Spatial (500m radius) + semantic clustering to identify duplicate reports
-- **Smart Routing** — Auto-routes complaints to the correct department based on AI classification + configurable rules
-- **Officer Review Queue** — Assign, override AI decisions, or merge duplicates with full audit trail
-- **Hotspot Intelligence** — Geographic clustering shows recurring problem areas with risk scoring
-- **Role-Based Access** — Citizen, Officer, Department Admin, Super Admin with proper RLS enforcement
-- **Responsive Design** — Mobile-first dark UI optimized for citizen reporting in the field
-- **Full Audit Trail** — Every AI decision and human override is logged
+Cities receive thousands of complaints every day through apps, WhatsApp, email, social media, phone calls, and government portals. These complaints are often scattered, duplicated, manually reviewed, poorly prioritized, and sent to the wrong department.
 
-## 🏗 Architecture
+This project solves that problem by using AI to turn raw citizen reports into actionable civic intelligence.
 
+## Problem Statement
+
+Traditional civic complaint systems are fragmented and manual, which leads to duplicate reports, slow processing, wrong department assignment, and poor transparency. Citizens often do not know what happened to their complaint after submission, while authorities struggle to prioritize urgent issues and identify recurring hotspots.
+
+## Proposed Solution
+
+The proposed solution is an AI-powered Civic Intelligence Platform that unifies complaint intake across multiple formats and automatically analyzes each report using multimodal AI. It identifies the issue type, detects duplicates, estimates urgency, routes the complaint to the correct department or officer, and gives citizens real-time status updates. The platform also provides administrators with dashboards, trend analytics, and hotspot insights to improve decision-making and resource allocation.
+
+## Features
+
+- Citizen registration and login.
+- Role-based access for Citizen, Officer, Department Admin, and Super Admin.
+- Multimodal complaint submission with text, image, video, audio, and GPS location.
+- AI-based issue classification and duplicate detection.
+- Automatic routing to the correct department/officer.
+- Complaint prioritization based on severity and urgency.
+- Citizen-facing complaint status tracking.
+- Admin dashboard for complaint monitoring and analytics.
+- Officer review queue and reassignment workflow.
+- Secure backend AI integration with Gemini.
+- Responsive UI for mobile and desktop.
+
+## Tech Stack
+
+### Frontend
+- React.js
+- Vite
+- React Router
+- Tailwind CSS
+- Axios
+
+### Backend
+- Node.js
+- Express.js
+- JWT Authentication
+- bcrypt
+- Zod
+- Multer
+
+### Database
+- PostgreSQL
+
+### AI
+- Google Gemini API
+- `@google/genai` SDK
+
+## Architecture
+
+The system is built as a full-stack application with:
+- A React frontend for users, officers, and admins.
+- An Express backend for APIs, authentication, routing, and file uploads.
+- A PostgreSQL database for persistent storage.
+- A server-side Gemini integration for multimodal AI analysis.
+
+## Folder Structure
+
+```txt
+src/
+  client/
+    assets/
+    components/
+    hooks/
+    layouts/
+    pages/
+    routes/
+    services/
+    styles/
+    utils/
+  server/
+    config/
+    controllers/
+    db/
+    middleware/
+    models/
+    routes/
+    services/
+    validators/
+    utils/
+    uploads/
+  shared/
+    schemas/
+    constants/
+    types/
 ```
-CityPulse-AI/
-├── client/          # React + Vite + Tailwind CSS frontend
-│   └── src/
-│       ├── components/  # Reusable UI components
-│       ├── contexts/    # Auth + Toast contexts
-│       ├── layouts/     # App, Auth, Admin layouts
-│       ├── pages/       # Public, Citizen, Officer, Admin pages
-│       ├── routes/      # React Router config + guards
-│       └── services/    # Axios API client
-├── server/          # Node.js + Express backend
-│   └── src/
-│       ├── config/      # Supabase client + env validation
-│       ├── controllers/ # Request handlers
-│       ├── middleware/  # Auth, error handler, rate limiter, upload
-│       ├── routes/      # Express route definitions
-│       ├── services/    # Gemini AI, deduplication, routing, audit
-│       └── validators/  # Zod validation schemas
-├── database/
-│   ├── schema.sql   # Full Supabase PostgreSQL schema with RLS
-│   └── seed.sql     # Seed departments and routing rules
-└── shared/          # Shared types and constants
-```
 
-## 🚀 Quick Start
+## Installation
 
 ### Prerequisites
-
 - Node.js 18+
-- A [Supabase](https://supabase.com) project
-- A [Google AI Studio](https://aistudio.google.com) Gemini API key
+- npm or yarn
+- PostgreSQL database
+- Google Gemini API key
 
-### 1. Clone & Install
-
+### Steps
 ```bash
-git clone <repo>
-cd CityPulse-AI
-npm run install:all
+git clone https://github.com/your-username/ai-civic-intelligence-platform.git
+cd ai-civic-intelligence-platform
+npm install
 ```
 
-### 2. Configure Supabase Database
+## Environment Variables
 
-1. Open your Supabase project → SQL Editor
-2. Run `database/schema.sql` to create all tables, indexes, and RLS policies
-3. Run `database/seed.sql` to seed departments and routing rules
-4. Enable the `pgvector` extension in Settings → Database → Extensions (for semantic search)
-
-### 3. Configure Environment
+Create a `.env` file in the backend and add the following:
 
 ```bash
-# Copy and fill in server/.env
-cp .env.example server/.env
+PORT=5000
+NODE_ENV=development
+DATABASE_URL=your_postgres_connection_string
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRES_IN=7d
+GEMINI_API_KEY=your_gemini_api_key
+UPLOAD_DIR=uploads
+MAX_FILE_SIZE_MB=25
+FRONTEND_URL=http://localhost:5173
 ```
 
-Fill in these values in `server/.env`:
+## Database Setup
 
-| Variable | Description |
-|---|---|
-| `SUPABASE_URL` | Your Supabase project URL |
-| `SUPABASE_ANON_KEY` | Supabase anon/public key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-only) |
-| `JWT_SECRET` | Random 64+ character string |
-| `GEMINI_API_KEY` | Google AI Studio API key |
+Run the PostgreSQL schema before starting the backend. Make sure your tables for users, complaints, departments, routing rules, uploads, assignments, and audit logs are created successfully.
 
-> ⚠️ **Never expose `GEMINI_API_KEY` or `SUPABASE_SERVICE_ROLE_KEY` to the frontend.**
+If using migrations or SQL scripts, run them in this order:
+1. Create base tables.
+2. Seed departments and officers.
+3. Enable row level security.
+4. Add routing rules.
 
-### 4. Run Development Servers
+## Running the Project
 
+### Backend
 ```bash
-# Run both frontend and backend concurrently
+cd server
+npm install
 npm run dev
-
-# Or separately:
-npm run dev:server  # Express on http://localhost:5000
-npm run dev:client  # Vite on http://localhost:5173
 ```
 
----
+### Frontend
+```bash
+cd client
+npm install
+npm run dev
+```
 
-## 🔐 Security
+### Production Build
+```bash
+npm run build
+```
 
-- **JWT Authentication** with bcrypt password hashing (12 salt rounds)
-- **Supabase RLS** — citizens only see their own data, officers see all complaints
-- **Gemini API key** is server-side only — never bundled into frontend code
-- **Multer** validates file MIME types and sizes before accepting uploads
-- **Zod** validates all input on every API endpoint
-- **Rate limiting** — 20 auth attempts/15min, 10 AI calls/min
-- **Audit logs** — every AI decision and human override is recorded
+## Usage
 
----
+1. Register or log in as a citizen, officer, or admin.
+2. Citizens submit complaints with text, photos, videos, voice notes, and location.
+3. The AI analyzes and classifies the complaint.
+4. The complaint is routed to the correct department or officer.
+5. Officers review and update cases.
+6. Admins monitor all complaints, assignments, and hotspot trends.
 
-## 🤖 AI Pipeline
-
-1. Citizen submits complaint with optional text, images, audio, video
-2. Backend uploads files to disk, creates complaint record
-3. **`runTriage()`** is called:
-   - Fetches nearby complaints for deduplication context
-   - Sends complaint + media (base64 inline) to Gemini 1.5 Flash
-   - Validates AI JSON response against Zod schema
-   - Runs spatial deduplication (500m radius, 72h window)
-   - Runs routing rules engine to assign department
-4. Complaint is updated with AI result + status
-5. If `review_required: true` → routed to officer queue
-6. Officer can assign, override, or merge via Review Queue
-
----
-
-## 📡 API Reference
+## API Endpoints
 
 ### Auth
-```
-POST /api/auth/register
-POST /api/auth/login
-GET  /api/auth/me
-POST /api/auth/logout
-PUT  /api/auth/profile
-```
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+- `POST /api/auth/logout`
 
 ### Complaints
-```
-GET  /api/complaints
-POST /api/complaints          # multipart/form-data with files
-GET  /api/complaints/:id
-PUT  /api/complaints/:id
-POST /api/complaints/:id/reanalyze
-POST /api/complaints/:id/close
-```
+- `GET /api/complaints`
+- `POST /api/complaints`
+- `GET /api/complaints/:id`
+- `PUT /api/complaints/:id`
+- `POST /api/complaints/:id/reanalyze`
+- `POST /api/complaints/:id/close`
 
-### Review (Officer+)
-```
-GET  /api/review-queue
-POST /api/review-queue/:id/assign
-POST /api/review-queue/:id/override
-POST /api/review-queue/:id/merge
-```
+### Review
+- `GET /api/review-queue`
+- `POST /api/review-queue/:id/assign`
+- `POST /api/review-queue/:id/override`
+- `POST /api/review-queue/:id/merge`
 
-### Insights (Officer+)
-```
-GET /api/insights/summary
-GET /api/insights/trends?days=30
-GET /api/insights/hotspots
-```
+### Departments
+- `GET /api/departments`
+- `POST /api/departments`
+- `PUT /api/departments/:id`
+- `DELETE /api/departments/:id`
+
+### Uploads
+- `POST /api/uploads`
+- `GET /api/uploads/:id`
+- `DELETE /api/uploads/:id`
+
+### Insights
+- `GET /api/insights/summary`
+- `GET /api/insights/trends`
+- `GET /api/insights/hotspots`
 
 ### Admin
+- `GET /api/admin/users`
+- `GET /api/admin/complaints`
+- `GET /api/admin/stats`
+- `GET /api/admin/audit-logs`
+
+## Deployment
+
+### Frontend
+Deploy the frontend on Vercel and set:
+```bash
+VITE_API_BASE_URL=https://your-backend-url
 ```
-GET   /api/admin/users
-PATCH /api/admin/users/:id/toggle-active
-GET   /api/admin/complaints
-GET   /api/admin/stats
-GET   /api/admin/audit-logs
+
+### Backend
+Deploy the backend on Render and set:
+```bash
+FRONTEND_URL=https://your-vercel-app.vercel.app
+DATABASE_URL=your_production_db_url
+JWT_SECRET=your_secret
+GEMINI_API_KEY=your_key
 ```
 
----
+## Screenshots
 
-## 🗺 Frontend Routes
+Add screenshots here:
+- Home page.
+- Complaint submission form.
+- AI result panel.
+- Officer review queue.
+- Admin dashboard.
 
-| Route | Role | Page |
-|---|---|---|
-| `/` | Public | Landing |
-| `/login` | Public | Login |
-| `/register` | Public | Register |
-| `/dashboard` | All | Citizen Dashboard |
-| `/report` | All | Report Issue |
-| `/complaints` | All | My Complaints |
-| `/complaints/:id` | All | Complaint Detail |
-| `/map` | All | Map View |
-| `/review-queue` | Officer+ | Review Queue |
-| `/review-queue/:id` | Officer+ | Review Detail |
-| `/hotspots` | Officer+ | Hotspot Map |
-| `/admin` | Admin | Admin Dashboard |
-| `/admin/users` | Admin | User Management |
-| `/admin/departments` | Admin | Departments |
-| `/admin/routing-rules` | Admin | Routing Rules |
+## Submission Requirements
 
----
+- Problem Statement.
+- Solution Description.
+- GitHub Repository.
+- Deployed Application Link.
+- Demo Video.
 
-## 🗄 Database Schema
+## Future Improvements
 
-Key tables:
-- `users` — Citizens, officers, admins with role + auth
-- `complaints` — Full complaint with AI result fields + embedding column
-- `complaint_updates` — Status timeline visible to citizens
-- `uploads` — Media file references
-- `departments` — City departments with contact info
-- `routing_rules` — Category→department mapping with keyword scoring
-- `complaint_relations` — Duplicate/merge links
-- `hotspot_insights` — Computed geographic risk clusters
-- `audit_logs` — Full audit trail of all actions
+- Live map-based complaint clustering.
+- SMS/WhatsApp complaint submission.
+- Better multilingual support.
+- Predictive maintenance analytics.
+- Automated citizen notifications.
 
----
+## Contributing
 
-## 📦 Tech Stack
+Pull requests are welcome. For major changes, please open an issue first to discuss the proposed changes.
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 18, Vite, Tailwind CSS, React Router v6 |
-| Maps | Leaflet.js + OpenStreetMap |
-| Charts | Recharts |
-| Backend | Node.js, Express.js |
-| Authentication | JWT + bcrypt |
-| Validation | Zod |
-| File Uploads | Multer |
-| Database | Supabase PostgreSQL |
-| AI | Google GenAI SDK (Gemini 1.5 Flash) |
-| Rate Limiting | express-rate-limit |
+## License
 
----
-
-## 📋 Issue Categories
-
-- Roads & Potholes
-- Garbage & Sanitation
-- Water Leakage
-- Sewage Overflow
-- Streetlight Failure
-- Electrical Hazards
-- Illegal Dumping
-- Fallen Trees & Debris
-- Drainage Blockage
-- Public Infrastructure Damage
-- Traffic Signal Failure
-- Public Safety Hazards
-- Flooding & Waterlogging
-- Noise or Nuisance
-- Unknown (requires review)
-
----
-
-## 🏛 Role Hierarchy
-
-| Role | Permissions |
-|---|---|
-| `citizen` | Submit complaints, view own complaints, close own complaints |
-| `officer` | View all complaints, review queue, assign, override AI, merge |
-| `department_admin` | Officer permissions + manage departments + routing rules |
-| `super_admin` | All permissions + manage users + audit logs |
-
----
-
-## 📄 License
-
-MIT — built for demonstration of AI civic intelligence capabilities.
-#   c i t y p u l s e - a i  
- 
+This project is licensed under the MIT License.
