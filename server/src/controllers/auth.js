@@ -90,7 +90,7 @@ export async function login(req, res, next) {
 
     const { data: user, error } = await supabase
       .from('users')
-      .select('*')
+      .select('*, departments(id, name)')
       .eq('email', data.email)
       .single();
 
@@ -119,6 +119,7 @@ export async function login(req, res, next) {
 
     const token = generateToken(user);
     const { password_hash, ...safeUser } = user;
+    safeUser.assignedDepartment = user.departments?.name || (user.role === 'officer' ? 'Not Assigned' : null);
 
     await logAudit({ user_id: user.id, action: 'user_login', metadata: { role: user.role }, ...getAuditMeta(req) });
 
@@ -132,12 +133,16 @@ export async function getMe(req, res, next) {
   try {
     const { data: user, error } = await supabase
       .from('users')
-      .select('id, full_name, email, phone, role, preferred_language, avatar_url, is_active, created_at, updated_at')
+      .select('id, full_name, email, phone, role, department_id, preferred_language, avatar_url, is_active, created_at, updated_at, departments(id, name)')
       .eq('id', req.user.id)
       .single();
 
     if (error || !user) return next(createError(404, 'User not found'));
-    res.json({ user });
+    const safeUser = {
+      ...user,
+      assignedDepartment: user.departments?.name || (user.role === 'officer' ? 'Not Assigned' : null),
+    };
+    res.json({ user: safeUser });
   } catch (err) {
     next(err);
   }
@@ -150,6 +155,7 @@ export async function logout(req, res) {
 
 export async function updateProfile(req, res, next) {
   try {
+    // IMMUTABILITY: Strictly restrict editable fields to full_name, phone, preferred_language
     const allowed = ['full_name', 'phone', 'preferred_language'];
     const updates = {};
     for (const key of allowed) {
@@ -161,11 +167,16 @@ export async function updateProfile(req, res, next) {
       .from('users')
       .update(updates)
       .eq('id', req.user.id)
-      .select('id, full_name, email, phone, role, preferred_language, avatar_url, created_at, updated_at')
+      .select('id, full_name, email, phone, role, department_id, preferred_language, avatar_url, created_at, updated_at, departments(id, name)')
       .single();
 
     if (error) return next(createError(500, error.message));
-    res.json({ user });
+
+    const safeUser = {
+      ...user,
+      assignedDepartment: user.departments?.name || (user.role === 'officer' ? 'Not Assigned' : null),
+    };
+    res.json({ user: safeUser });
   } catch (err) {
     next(err);
   }
