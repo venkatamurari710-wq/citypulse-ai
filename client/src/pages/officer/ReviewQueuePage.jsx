@@ -93,9 +93,16 @@ function ReviewQueueDashboardContent() {
   const fetchDashboard = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get('/officer/dashboard', {
-        params: { page, limit: LIMIT, filter: activeTab },
-      });
+      let res;
+      try {
+        res = await api.get('/officer/dashboard', {
+          params: { page, limit: LIMIT, filter: activeTab },
+        });
+      } catch (e1) {
+        res = await api.get('/review-queue/summary', {
+          params: { page, limit: LIMIT, filter: activeTab },
+        });
+      }
       const data = res.data;
       setSummary({
         totalComplaints: data.totalComplaints || 0,
