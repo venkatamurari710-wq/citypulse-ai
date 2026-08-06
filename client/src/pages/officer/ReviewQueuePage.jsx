@@ -32,14 +32,52 @@ function StatCard({ icon: Icon, label, value, color, active, onClick }) {
       <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">{label}</div>
     </button>
   );
+class OfficerErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('[Officer Dashboard Error Boundary]:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-8 max-w-xl mx-auto my-12 bg-white border border-neutral-200 rounded-2xl shadow-sm text-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
+            <AlertTriangle className="w-6 h-6" />
+          </div>
+          <h2 className="text-xl font-bold text-neutral-900">Officer Dashboard Issue</h2>
+          <p className="text-sm text-neutral-600">
+            A temporary issue occurred while rendering the officer dashboard.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="btn btn-primary btn-sm"
+          >
+            <RefreshCw className="w-4 h-4" /> Reload Dashboard
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
-export default function ReviewQueuePage() {
+function ReviewQueueDashboardContent() {
   const { user } = useAuth();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'needs_review';
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
   const LIMIT = 15;
 
   const [summary, setSummary] = useState({
@@ -315,5 +353,13 @@ export default function ReviewQueuePage() {
         <Pagination page={page} limit={LIMIT} total={total} onPageChange={setPage} />
       </div>
     </div>
+  );
+}
+
+export default function ReviewQueuePage() {
+  return (
+    <OfficerErrorBoundary>
+      <ReviewQueueDashboardContent />
+    </OfficerErrorBoundary>
   );
 }
