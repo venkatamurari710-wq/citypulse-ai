@@ -56,7 +56,8 @@ export default function LoginPage() {
         navigate('/dashboard');
       }
     } catch (err) {
-      const msg = err.response?.data?.error || 'Login failed. Please check your credentials.';
+      const data = err.response?.data;
+      const msg = data?.error || (typeof data?.details === 'string' ? data.details : err.message || 'Login failed. Please check your credentials.');
       toast(msg, 'error');
       setErrors({ general: msg });
     } finally {

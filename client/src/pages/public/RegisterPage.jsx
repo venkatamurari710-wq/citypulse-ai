@@ -76,19 +76,26 @@ export default function RegisterPage() {
       }
     } catch (err) {
       const data = err.response?.data;
-      if (data?.details) {
-        const errs = {};
-        if (Array.isArray(data.details)) {
-          data.details.forEach(d => { errs[d.field] = d.message; });
-        } else {
-          setErrors(data.details);
-        }
-        setErrors(errs);
+      const fieldErrors = {};
+      let mainError = '';
+
+      if (data?.details && Array.isArray(data.details)) {
+        data.details.forEach(d => {
+          if (d.field) fieldErrors[d.field] = d.message;
+        });
+        mainError = data.error ? `${data.error}: ${data.details.map(d => d.message).join(' | ')}` : data.details.map(d => d.message).join(' | ');
+      } else if (data?.error) {
+        mainError = data.error;
+      } else if (typeof data?.details === 'string') {
+        mainError = data.details;
+      } else if (err.message) {
+        mainError = err.message;
       } else {
-        const msg = data?.error || 'Registration failed. Please try again.';
-        setErrors({ general: msg });
-        toast(msg, 'error');
+        mainError = 'Registration failed. Please check your details and try again.';
       }
+
+      setErrors({ ...fieldErrors, general: mainError });
+      toast(mainError, 'error');
     } finally {
       setLoading(false);
     }
