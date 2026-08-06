@@ -13,7 +13,7 @@ export default function AuthLayout({ children }) {
           <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-emerald-400 rounded-full blur-3xl" />
         </div>
         
-        <CityPulseLogo size="lg" to="/" />
+        <CityPulseLogo size="lg" lightText={true} to="/" />
         
         <div className="relative z-10">
           <h2 className="text-4xl font-grotesk font-extrabold text-white leading-tight mb-4">

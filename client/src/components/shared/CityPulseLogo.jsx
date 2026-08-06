@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-export default function CityPulseLogo({ className = '', size = 'md', showText = true, to = '/' }) {
+export default function CityPulseLogo({ className = '', size = 'md', showText = true, lightText = false, to = '/' }) {
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-10 h-10',
@@ -17,6 +17,8 @@ export default function CityPulseLogo({ className = '', size = 'md', showText = 
     xl: 'text-3xl sm:text-4xl',
   };
 
+  const textColorClass = lightText ? 'text-white' : 'text-slate-900 dark:text-white';
+
   const content = (
     <div className={`inline-flex items-center gap-2.5 group ${className}`}>
       {/* Balloon Pin Logo Image — Transparent, no background box */}
@@ -29,8 +31,8 @@ export default function CityPulseLogo({ className = '', size = 'md', showText = 
         }}
       />
       {showText && (
-        <span className={`font-grotesk font-extrabold tracking-tight text-[#111827] dark:text-white flex items-center gap-1 ${textSizes[size] || 'text-2xl'}`}>
-          CityPulse <span className="bg-gradient-to-r from-[#7C3AED] via-purple-600 to-violet-500 bg-clip-text text-transparent">AI</span>
+        <span className={`font-grotesk font-extrabold tracking-tight flex items-center gap-1 ${textColorClass} ${textSizes[size] || 'text-2xl'}`}>
+          CityPulse <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">AI</span>
         </span>
       )}
     </div>

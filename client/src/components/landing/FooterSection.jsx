@@ -15,7 +15,7 @@ export default function FooterSection() {
           
           {/* Column 1: Brand Info */}
           <div className="lg:col-span-2 space-y-4">
-            <CityPulseLogo size="md" to="/" />
+            <CityPulseLogo size="md" lightText={true} to="/" />
             <p className="text-sm text-slate-400 max-w-sm font-normal leading-relaxed">
               AI-Powered Smart City platform streamlining citizen complaint reporting, neural classification, geospatial duplicate detection, and automated department routing.
             </p>
