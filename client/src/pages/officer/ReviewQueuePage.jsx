@@ -301,51 +301,54 @@ function ReviewQueueDashboardContent() {
                   </td>
                 </tr>
               ) : (
-                filtered.map(c => (
-                  <tr key={c.id} className="hover:bg-neutral-50/80 transition-colors">
-                    <td>
-                      <span className="text-[11px] font-mono font-semibold text-neutral-400 block">
-                        #{c.id?.slice(0, 8)}
-                      </span>
-                      <div className="font-bold text-neutral-900 max-w-xs truncate">{c.title}</div>
-                    </td>
-                    <td>
-                      <span className="text-xs font-semibold text-neutral-700 capitalize">
-                        {c.issue_category?.replace(/_/g, ' ')}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="text-xs font-semibold text-neutral-900">{c.users?.full_name || 'Citizen'}</div>
-                      <div className="text-[11px] text-neutral-400 font-medium">{c.users?.email}</div>
-                    </td>
-                    <td>
-                      <div className="text-xs text-neutral-600 max-w-xs truncate flex items-center gap-1 font-medium">
-                        <MapPin className="w-3 h-3 text-neutral-400 shrink-0" />
-                        {c.address_text || 'GPS Coordinates'}
-                      </div>
-                    </td>
-                    <td>
-                      <div className="flex flex-col gap-1">
-                        {c.severity && <SeverityBadge severity={c.severity} />}
-                        {c.urgency && <UrgencyBadge urgency={c.urgency} />}
-                      </div>
-                    </td>
-                    <td>
-                      <StatusBadge status={c.status} />
-                    </td>
-                    <td className="text-xs text-neutral-500 font-medium whitespace-nowrap">
-                      {formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}
-                    </td>
-                    <td className="text-right">
-                      <Link
-                        to={`/review-queue/${c.id}`}
-                        className="btn-primary btn-xs inline-flex items-center gap-1 font-bold"
-                      >
-                        Review / Action <ArrowRight className="w-3 h-3" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))
+                filtered.map(c => {
+                  if (!c || !c.id) return null;
+                  return (
+                    <tr key={c.id} className="hover:bg-neutral-50/80 transition-colors">
+                      <td>
+                        <span className="text-[11px] font-mono font-semibold text-neutral-400 block">
+                          #{c.id?.slice(0, 8)}
+                        </span>
+                        <div className="font-bold text-neutral-900 max-w-xs truncate">{c.title || 'Untitled Complaint'}</div>
+                      </td>
+                      <td>
+                        <span className="text-xs font-semibold text-neutral-700 capitalize">
+                          {c.issue_category?.replace(/_/g, ' ') || 'General'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="text-xs font-semibold text-neutral-900">{c.users?.full_name || 'Citizen'}</div>
+                        <div className="text-[11px] text-neutral-400 font-medium">{c.users?.email || ''}</div>
+                      </td>
+                      <td>
+                        <div className="text-xs text-neutral-600 max-w-xs truncate flex items-center gap-1 font-medium">
+                          <MapPin className="w-3 h-3 text-neutral-400 shrink-0" />
+                          {c.address_text || 'GPS Location'}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="flex flex-col gap-1">
+                          {c.severity && <SeverityBadge severity={c.severity} />}
+                          {c.urgency && <UrgencyBadge urgency={c.urgency} />}
+                        </div>
+                      </td>
+                      <td>
+                        <StatusBadge status={c.status || 'pending'} />
+                      </td>
+                      <td className="text-xs text-neutral-500 font-medium whitespace-nowrap">
+                        {c.created_at ? formatDistanceToNow(new Date(c.created_at), { addSuffix: true }) : 'Recently'}
+                      </td>
+                      <td className="text-right">
+                        <Link
+                          to={`/review-queue/${c.id}`}
+                          className="btn-primary btn-xs inline-flex items-center gap-1 font-bold"
+                        >
+                          Review / Action <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

@@ -114,10 +114,10 @@ export default function AppLayout({ children }) {
               className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-white border border-transparent hover:border-neutral-200 transition-all shadow-xs"
             >
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-xs font-bold text-white shadow-xs">
-                {user?.full_name?.[0]?.toUpperCase()}
+                {(user?.full_name || user?.fullName || user?.email || 'U')[0]?.toUpperCase()}
               </div>
               <div className="flex-1 text-left overflow-hidden">
-                <div className="text-sm font-semibold text-neutral-900 truncate">{user?.full_name}</div>
+                <div className="text-sm font-semibold text-neutral-900 truncate">{user?.full_name || user?.fullName || 'Officer'}</div>
                 <div className="text-xs text-neutral-500 truncate font-medium">{user?.email}</div>
               </div>
               <ChevronDown className={`w-4 h-4 text-neutral-400 transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
