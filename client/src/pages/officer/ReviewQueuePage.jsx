@@ -48,53 +48,42 @@ export default function ReviewQueuePage() {
   });
   const [complaints, setComplaints] = useState([]);
   const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [summaryLoading, setSummaryLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
-  const LIMIT = 15;
-
-  const loadSummary = useCallback(async () => {
-    setSummaryLoading(true);
-    try {
-      const res = await api.get('/review-queue/summary');
-      setSummary(res.data);
-    } catch (err) {
-      console.error('Failed to load dashboard summary:', err);
-    } finally {
-      setSummaryLoading(false);
-    }
-  }, []);
-
-  const loadComplaints = useCallback(async () => {
+  const fetchDashboard = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get('/review-queue', {
+      const res = await api.get('/officer/dashboard', {
         params: { page, limit: LIMIT, filter: activeTab },
       });
-      setComplaints(res.data.complaints || []);
-      setTotal(res.data.total || 0);
+      const data = res.data;
+      setSummary({
+        totalComplaints: data.totalComplaints || 0,
+        activeComplaints: data.activeComplaints || 0,
+        pendingReview: data.pendingReview || 0,
+        resolvedComplaints: data.resolvedComplaints || 0,
+        departmentName: data.departmentName || '',
+      });
+      setComplaints(data.complaints || []);
+      setTotal(data.totalFiltered || 0);
     } catch (err) {
-      console.error('Failed to load review queue complaints:', err);
+      console.error('Failed to load officer dashboard:', err);
+      toast('Failed to load dashboard data', 'error');
     } finally {
       setLoading(false);
     }
-  }, [page, activeTab]);
+  }, [page, activeTab, toast]);
 
   useEffect(() => {
-    loadSummary();
-    loadComplaints();
-  }, [loadSummary, loadComplaints]);
+    fetchDashboard();
+  }, [fetchDashboard]);
 
   const handleTabChange = (tabKey) => {
     setSearchParams({ tab: tabKey });
     setPage(1);
   };
 
-  const handleRefresh = () => {
-    loadSummary();
-    loadComplaints();
-    toast('Dashboard refreshed', 'info');
+  const handleRefresh = async () => {
+    await fetchDashboard();
+    toast('Dashboard & counts refreshed!', 'success');
   };
 
   const filtered = search
@@ -136,7 +125,7 @@ export default function ReviewQueuePage() {
         <StatCard
           icon={FileText}
           label="Total Complaints"
-          value={summaryLoading ? '...' : summary.totalComplaints}
+          value={loading ? '...' : summary.totalComplaints}
           color="bg-primary-600"
           active={activeTab === 'all'}
           onClick={() => handleTabChange('all')}
@@ -144,7 +133,7 @@ export default function ReviewQueuePage() {
         <StatCard
           icon={Clock}
           label="Active Complaints"
-          value={summaryLoading ? '...' : summary.activeComplaints}
+          value={loading ? '...' : summary.activeComplaints}
           color="bg-blue-600"
           active={activeTab === 'active'}
           onClick={() => handleTabChange('active')}
@@ -152,7 +141,7 @@ export default function ReviewQueuePage() {
         <StatCard
           icon={AlertTriangle}
           label="Pending Review"
-          value={summaryLoading ? '...' : summary.pendingReview}
+          value={loading ? '...' : summary.pendingReview}
           color="bg-amber-500"
           active={activeTab === 'needs_review'}
           onClick={() => handleTabChange('needs_review')}
@@ -160,7 +149,7 @@ export default function ReviewQueuePage() {
         <StatCard
           icon={CheckCircle}
           label="Resolved Complaints"
-          value={summaryLoading ? '...' : summary.resolvedComplaints}
+          value={loading ? '...' : summary.resolvedComplaints}
           color="bg-emerald-600"
           active={activeTab === 'resolved'}
           onClick={() => handleTabChange('resolved')}

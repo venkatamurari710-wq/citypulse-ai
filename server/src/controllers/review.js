@@ -5,107 +5,90 @@ import { createError } from '../middleware/errorHandler.js';
 import { logAudit, getAuditMeta } from '../services/audit.js';
 
 export async function getReviewQueue(req, res, next) {
-  try {
-    const { page = 1, limit = 20, status, filter } = req.query;
-    const offset = (parseInt(page) - 1) * parseInt(limit);
-    const isOfficer = req.user.role === 'officer';
+  return getOfficerDashboard(req, res, next);
+}
 
-    let query = supabase
-      .from('complaints')
-      .select(`
+export async function getOfficerDashboard(req, res, next) {
+  try {
+    const isOfficer = req.user.role === 'officer';
+    const deptId = isOfficer ? req.user.department_id : null;
+    const { page = 1, limit = 15, filter = 'needs_review' } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    // Apply strict department filter helper
+    const applyDeptFilter = (query) => {
+      if (isOfficer) {
+        if (deptId) {
+          return query.eq('department_id', deptId);
+        } else {
+          return query.is('department_id', null);
+        }
+      }
+      return query;
+    };
+
+    // 1. Fetch summary counts matching department complaints
+    let totalQ = applyDeptFilter(supabase.from('complaints').select('id', { count: 'exact', head: true }));
+    let activeQ = applyDeptFilter(supabase.from('complaints').select('id', { count: 'exact', head: true }).in('status', ['assigned', 'in_progress', 'analyzing', 'investigating']));
+    let pendingQ = applyDeptFilter(supabase.from('complaints').select('id', { count: 'exact', head: true }).in('status', ['pending', 'needs_review', 'submitted']));
+    let resolvedQ = applyDeptFilter(supabase.from('complaints').select('id', { count: 'exact', head: true }).in('status', ['resolved', 'closed']));
+
+    // 2. Fetch filtered complaints table data
+    let complaintsQ = applyDeptFilter(
+      supabase.from('complaints').select(`
         id, title, issue_category, issue_subcategory, severity, urgency, status,
         duplicate_status, confidence, review_required, address_text, latitude, longitude,
         created_at, updated_at,
         departments(id, name),
         users(id, full_name, email),
         uploads(id, file_type)
-      `, { count: 'exact' });
-
-    // Strict Department Scoping for Officers
-    if (isOfficer) {
-      if (req.user.department_id) {
-        query = query.eq('department_id', req.user.department_id);
-      } else {
-        query = query.is('department_id', null);
-      }
-    }
+      `, { count: 'exact' })
+    );
 
     if (filter === 'active') {
-      query = query.in('status', ['assigned', 'in_progress', 'analyzing']);
-    } else if (filter === 'needs_review') {
-      query = query.in('status', ['pending', 'needs_review']);
+      complaintsQ = complaintsQ.in('status', ['assigned', 'in_progress', 'analyzing', 'investigating']);
+    } else if (filter === 'needs_review' || filter === 'pending') {
+      complaintsQ = complaintsQ.in('status', ['pending', 'needs_review', 'submitted']);
     } else if (filter === 'resolved') {
-      query = query.in('status', ['resolved', 'closed']);
-    } else if (status && status !== 'all') {
-      query = query.eq('status', status);
+      complaintsQ = complaintsQ.in('status', ['resolved', 'closed']);
     }
 
-    query = query
+    complaintsQ = complaintsQ
       .order('created_at', { ascending: false })
       .range(offset, offset + parseInt(limit) - 1);
-
-    const { data, error, count } = await query;
-    if (error) return next(createError(500, error.message));
-
-    res.json({ complaints: data, total: count, page: parseInt(page), limit: parseInt(limit) });
-  } catch (err) { next(err); }
-}
-
-export async function getOfficerDashboard(req, res, next) {
-  try {
-    const isOfficer = req.user.role === 'officer';
-    const deptId = isOfficer ? (req.user.department_id || '00000000-0000-0000-0000-000000000000') : null;
-
-    let totalQuery = supabase.from('complaints').select('id', { count: 'exact', head: true });
-    let activeQuery = supabase.from('complaints').select('id', { count: 'exact', head: true }).in('status', ['assigned', 'in_progress', 'analyzing']);
-    let pendingQuery = supabase.from('complaints').select('id', { count: 'exact', head: true }).in('status', ['pending', 'needs_review']);
-    let resolvedQuery = supabase.from('complaints').select('id', { count: 'exact', head: true }).in('status', ['resolved', 'closed']);
-
-    let recentQuery = supabase
-      .from('complaints')
-      .select(`
-        id, title, issue_category, severity, urgency, status, address_text, created_at,
-        users(id, full_name, email),
-        departments(id, name)
-      `)
-      .order('created_at', { ascending: false })
-      .limit(10);
-
-    if (deptId) {
-      totalQuery = totalQuery.eq('department_id', deptId);
-      activeQuery = activeQuery.eq('department_id', deptId);
-      pendingQuery = pendingQuery.eq('department_id', deptId);
-      resolvedQuery = resolvedQuery.eq('department_id', deptId);
-      recentQuery = recentQuery.eq('department_id', deptId);
-    }
 
     const [
       { count: totalComplaints },
       { count: activeComplaints },
       { count: pendingReview },
       { count: resolvedComplaints },
-      { data: recentComplaints }
+      { data: complaintsData, count: totalFiltered, error }
     ] = await Promise.all([
-      totalQuery,
-      activeQuery,
-      pendingQuery,
-      resolvedQuery,
-      recentQuery
+      totalQ,
+      activeQ,
+      pendingQ,
+      resolvedQ,
+      complaintsQ
     ]);
 
+    if (error) return next(createError(500, error.message));
+
     let departmentName = null;
-    if (deptId && deptId !== '00000000-0000-0000-0000-000000000000') {
+    if (deptId) {
       const { data: dept } = await supabase.from('departments').select('name').eq('id', deptId).single();
       if (dept) departmentName = dept.name;
     }
 
     res.json({
-      departmentName: departmentName || (isOfficer ? 'Unassigned Department' : 'All Departments'),
+      departmentName: departmentName || (isOfficer ? 'General Review Queue' : 'All Departments'),
       totalComplaints: totalComplaints || 0,
       activeComplaints: activeComplaints || 0,
       pendingReview: pendingReview || 0,
       resolvedComplaints: resolvedComplaints || 0,
-      recentComplaints: recentComplaints || []
+      complaints: complaintsData || [],
+      totalFiltered: totalFiltered || 0,
+      page: parseInt(page),
+      limit: parseInt(limit)
     });
   } catch (err) {
     next(err);

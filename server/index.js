@@ -81,6 +81,7 @@ app.use('/api/department-officers', (req, res, next) => {
 app.use('/api/routing-rules', routingRuleRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/review-queue', reviewRoutes);
+app.use('/api/officer', reviewRoutes);
 app.use('/api/insights', insightRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/debug', debugRoutes);
