@@ -11,29 +11,41 @@ export async function getReviewQueue(req, res, next) {
 export async function getOfficerDashboard(req, res, next) {
   try {
     const isOfficer = req.user.role === 'officer';
-    const deptId = isOfficer ? req.user.department_id : null;
+    let deptId = req.user.department_id || null;
+
+    // Resolve department_id if missing from token
+    if (isOfficer && !deptId) {
+      const { data: userRec } = await supabase.from('users').select('department_id').eq('id', req.user.id).maybeSingle();
+      if (userRec?.department_id) {
+        deptId = userRec.department_id;
+      } else {
+        const { data: deptOfficer } = await supabase.from('department_officers').select('department_id').eq('user_id', req.user.id).maybeSingle();
+        if (deptOfficer?.department_id) deptId = deptOfficer.department_id;
+      }
+    }
+
     const { page = 1, limit = 15, filter = 'needs_review' } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
-    // Apply strict department filter helper
+    // Apply department scoping filter
     const applyDeptFilter = (query) => {
       if (isOfficer) {
         if (deptId) {
           return query.eq('department_id', deptId);
         } else {
-          return query.is('department_id', null);
+          return query.or('department_id.is.null,review_required.eq.true,status.eq.needs_review');
         }
       }
       return query;
     };
 
-    // 1. Fetch summary counts matching department complaints
+    // 1. Fetch summary counts
     let totalQ = applyDeptFilter(supabase.from('complaints').select('id', { count: 'exact', head: true }));
     let activeQ = applyDeptFilter(supabase.from('complaints').select('id', { count: 'exact', head: true }).in('status', ['assigned', 'in_progress', 'analyzing', 'investigating']));
     let pendingQ = applyDeptFilter(supabase.from('complaints').select('id', { count: 'exact', head: true }).in('status', ['pending', 'needs_review', 'submitted']));
     let resolvedQ = applyDeptFilter(supabase.from('complaints').select('id', { count: 'exact', head: true }).in('status', ['resolved', 'closed']));
 
-    // 2. Fetch filtered complaints table data
+    // 2. Fetch complaint table data
     let complaintsQ = applyDeptFilter(
       supabase.from('complaints').select(`
         id, title, issue_category, issue_subcategory, severity, urgency, status,
@@ -71,11 +83,14 @@ export async function getOfficerDashboard(req, res, next) {
       complaintsQ
     ]);
 
-    if (error) return next(createError(500, error.message));
+    if (error) {
+      console.error('[OFFICER DASHBOARD QUERY ERROR]:', error.message);
+      return next(createError(500, error.message));
+    }
 
     let departmentName = null;
     if (deptId) {
-      const { data: dept } = await supabase.from('departments').select('name').eq('id', deptId).single();
+      const { data: dept } = await supabase.from('departments').select('name').eq('id', deptId).maybeSingle();
       if (dept) departmentName = dept.name;
     }
 
