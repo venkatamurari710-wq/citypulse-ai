@@ -1,27 +1,29 @@
+// client/src/layouts/AuthLayout.jsx
+import React from 'react';
 import { Link } from 'react-router-dom';
 import CityPulseLogo from '../components/shared/CityPulseLogo';
 
 export default function AuthLayout({ children }) {
   return (
-    <div className="min-h-screen flex">
-      {/* Left panel — branding with rich soft violet gradient */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#7C3AED] via-purple-700 to-violet-950 relative overflow-hidden flex-col justify-between p-12 text-white">
+    <div className="min-h-screen flex bg-slate-50">
+      {/* Left panel — branding with rich civic navy/blue gradient */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0F2C59] via-[#1E3A8A] to-[#16A34A] relative overflow-hidden flex-col justify-between p-12 text-white">
         <div className="absolute inset-0 opacity-20 pointer-events-none">
           <div className="absolute -top-24 -left-24 w-96 h-96 bg-white rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-purple-400 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-emerald-400 rounded-full blur-3xl" />
         </div>
         
         <CityPulseLogo size="lg" to="/" />
         
         <div className="relative z-10">
-          <h2 className="text-4xl font-display font-extrabold text-white leading-tight mb-4">
+          <h2 className="text-4xl font-grotesk font-extrabold text-white leading-tight mb-4">
             Smart Civic<br />Intelligence<br />Platform
           </h2>
-          <p className="text-indigo-100 text-base leading-relaxed max-w-md">
+          <p className="text-blue-100 text-base leading-relaxed max-w-md font-sans">
             AI-powered complaint management for modern municipalities. 
             Report issues, track resolutions, and make your city smarter.
           </p>
-          <div className="mt-8 grid grid-cols-2 gap-4">
+          <div className="mt-8 grid grid-cols-2 gap-4 font-sans">
             {[
               { label: 'Complaints Resolved', value: '12,450+' },
               { label: 'Cities Served', value: '48' },
@@ -29,24 +31,21 @@ export default function AuthLayout({ children }) {
               { label: 'Satisfaction Rate', value: '94%' },
             ].map(s => (
               <div key={s.label} className="bg-white/10 backdrop-blur-md border border-white/15 rounded-xl p-4">
-                <div className="text-2xl font-display font-extrabold text-white">{s.value}</div>
-                <div className="text-xs text-indigo-100 mt-1 font-medium">{s.label}</div>
+                <div className="text-2xl font-grotesk font-extrabold text-white">{s.value}</div>
+                <div className="text-xs text-blue-100 mt-1 font-medium">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="relative text-indigo-200 text-xs">© 2026 CityPulse AI. All rights reserved.</p>
+        <p className="relative text-blue-200 text-xs font-sans">© 2026 CityPulse AI. All rights reserved.</p>
       </div>
 
       {/* Right panel — clean white form container */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 bg-neutral-50">
-        <div className="w-full max-w-md animate-fade-in bg-white p-8 rounded-2xl border border-neutral-200 shadow-card-lg">
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 bg-slate-50">
+        <div className="w-full max-w-md animate-fade-in bg-white p-8 rounded-2xl border border-slate-200 shadow-card-lg">
           <div className="lg:hidden flex items-center gap-3 mb-8">
-            <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center shadow-xs">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-lg font-display font-bold text-neutral-900">CityPulse AI</span>
+            <CityPulseLogo size="md" />
           </div>
           {children}
         </div>
