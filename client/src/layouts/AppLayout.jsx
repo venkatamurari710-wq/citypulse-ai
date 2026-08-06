@@ -41,15 +41,19 @@ export default function AppLayout({ children }) {
   ];
 
   const officerNav = [
-    { to: '/review-queue', icon: ClipboardList, label: 'Review Queue' },
+    { to: '/review-queue', icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/review-queue?tab=needs_review', icon: ClipboardList, label: 'Review Queue' },
     { to: '/hotspots', icon: Flame, label: 'Hotspots' },
     { to: '/departments', icon: Building2, label: 'Departments' },
+    { to: '/map', icon: Map, label: 'Map View' },
   ];
 
   const adminNav = [
     { to: '/admin', icon: Settings, label: 'Admin Panel' },
     { to: '/admin/users', icon: Users, label: 'Users' },
   ];
+
+  const isCitizen = user?.role === 'citizen';
 
   return (
     <div className="min-h-screen flex bg-neutral-50 text-neutral-900">
@@ -65,7 +69,7 @@ export default function AppLayout({ children }) {
         
         {/* Logo */}
         <div className="p-5 border-b border-neutral-100 flex items-center justify-between">
-          <Link to="/dashboard" className="flex items-center gap-3">
+          <Link to={isOfficer ? "/review-queue" : "/dashboard"} className="flex items-center gap-3">
             <div className="w-9 h-9 bg-gradient-to-br from-primary-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-sm">
               <Shield className="w-5 h-5 text-white" />
             </div>
@@ -81,12 +85,16 @@ export default function AppLayout({ children }) {
 
         {/* Navigation */}
         <nav className="flex-1 p-3.5 flex flex-col gap-1 overflow-y-auto">
-          <div className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mb-1 mt-1">Main Menu</div>
-          {citizenNav.map(n => <NavItem key={n.to} {...n} />)}
+          {isCitizen && (
+            <>
+              <div className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mb-1 mt-1">Main Menu</div>
+              {citizenNav.map(n => <NavItem key={n.to} {...n} />)}
+            </>
+          )}
 
           {isOfficer && (
             <>
-              <div className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mt-4 mb-1">Officer Tools</div>
+              <div className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider px-3 mb-1 mt-1">Officer Tools</div>
               {officerNav.map(n => <NavItem key={n.to} {...n} />)}
             </>
           )}
@@ -136,13 +144,17 @@ export default function AppLayout({ children }) {
           <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-neutral-100 text-neutral-600">
             <Menu className="w-5 h-5" />
           </button>
-          <Link to="/dashboard" className="flex items-center gap-2">
+          <Link to={isOfficer ? "/review-queue" : "/dashboard"} className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-primary-600" />
             <span className="font-display font-bold text-neutral-900 text-sm">CityPulse AI</span>
           </Link>
-          <Link to="/report" className="p-2 bg-primary-600 rounded-lg text-white">
-            <Plus className="w-4 h-4" />
-          </Link>
+          {isCitizen ? (
+            <Link to="/report" className="p-2 bg-primary-600 rounded-lg text-white">
+              <Plus className="w-4 h-4" />
+            </Link>
+          ) : (
+            <div className="w-8" />
+          )}
         </header>
 
         <main className="flex-1 p-4 lg:p-8 animate-fade-in max-w-7xl w-full mx-auto">

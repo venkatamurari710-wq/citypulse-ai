@@ -67,7 +67,7 @@ export default function AppRouter() {
 
         {/* Citizen */}
         <Route path="/dashboard" element={<ProtectedRoute><AppLayout><DashboardPage /></AppLayout></ProtectedRoute>} />
-        <Route path="/report" element={<ProtectedRoute><AppLayout><ReportPage /></AppLayout></ProtectedRoute>} />
+        <Route path="/report" element={<ProtectedRoute allowedRoles={['citizen']}><AppLayout><ReportPage /></AppLayout></ProtectedRoute>} />
         <Route path="/complaints" element={<ProtectedRoute><AppLayout><ComplaintsPage /></AppLayout></ProtectedRoute>} />
         <Route path="/complaints/:complaintId" element={<ProtectedRoute><AppLayout><ComplaintDetailPage /></AppLayout></ProtectedRoute>} />
         <Route path="/map" element={<ProtectedRoute><AppLayout><MapPage /></AppLayout></ProtectedRoute>} />

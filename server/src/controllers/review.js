@@ -6,10 +6,12 @@ import { logAudit, getAuditMeta } from '../services/audit.js';
 
 export async function getReviewQueue(req, res, next) {
   try {
-    const { page = 1, limit = 20, status = 'needs_review' } = req.query;
+    const { page = 1, limit = 20, status, filter } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
+    const isOfficer = req.user.role === 'officer';
+    const deptId = isOfficer && req.user.department_id ? req.user.department_id : null;
 
-    const { data, error, count } = await supabase
+    let query = supabase
       .from('complaints')
       .select(`
         id, title, issue_category, issue_subcategory, severity, urgency, status,
@@ -18,15 +20,85 @@ export async function getReviewQueue(req, res, next) {
         departments(id, name),
         users(id, full_name, email),
         uploads(id, file_type)
-      `, { count: 'exact' })
-      .eq('review_required', true)
-      .not('status', 'in', '("resolved","closed")')
+      `, { count: 'exact' });
+
+    if (deptId) {
+      query = query.eq('department_id', deptId);
+    }
+
+    if (filter === 'active') {
+      query = query.in('status', ['assigned', 'in_progress', 'analyzing']);
+    } else if (filter === 'needs_review') {
+      query = query.in('status', ['pending', 'needs_review']);
+    } else if (filter === 'resolved') {
+      query = query.in('status', ['resolved', 'closed']);
+    } else if (status && status !== 'all') {
+      query = query.eq('status', status);
+    }
+
+    query = query
       .order('created_at', { ascending: false })
       .range(offset, offset + parseInt(limit) - 1);
 
+    const { data, error, count } = await query;
     if (error) return next(createError(500, error.message));
+
     res.json({ complaints: data, total: count, page: parseInt(page), limit: parseInt(limit) });
   } catch (err) { next(err); }
+}
+
+export async function getOfficerDashboard(req, res, next) {
+  try {
+    const isOfficer = req.user.role === 'officer';
+    const deptId = isOfficer && req.user.department_id ? req.user.department_id : null;
+
+    let totalQuery = supabase.from('complaints').select('id', { count: 'exact', head: true });
+    let activeQuery = supabase.from('complaints').select('id', { count: 'exact', head: true }).in('status', ['assigned', 'in_progress', 'analyzing']);
+    let pendingQuery = supabase.from('complaints').select('id', { count: 'exact', head: true }).in('status', ['pending', 'needs_review']);
+    let resolvedQuery = supabase.from('complaints').select('id', { count: 'exact', head: true }).in('status', ['resolved', 'closed']);
+
+    let recentQuery = supabase
+      .from('complaints')
+      .select(`
+        id, title, issue_category, severity, urgency, status, address_text, created_at,
+        users(id, full_name, email),
+        departments(id, name)
+      `)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (deptId) {
+      totalQuery = totalQuery.eq('department_id', deptId);
+      activeQuery = activeQuery.eq('department_id', deptId);
+      pendingQuery = pendingQuery.eq('department_id', deptId);
+      resolvedQuery = resolvedQuery.eq('department_id', deptId);
+      recentQuery = recentQuery.eq('department_id', deptId);
+    }
+
+    const [
+      { count: totalComplaints },
+      { count: activeComplaints },
+      { count: pendingReview },
+      { count: resolvedComplaints },
+      { data: recentComplaints }
+    ] = await Promise.all([
+      totalQuery,
+      activeQuery,
+      pendingQuery,
+      resolvedQuery,
+      recentQuery
+    ]);
+
+    res.json({
+      totalComplaints: totalComplaints || 0,
+      activeComplaints: activeComplaints || 0,
+      pendingReview: pendingReview || 0,
+      resolvedComplaints: resolvedComplaints || 0,
+      recentComplaints: recentComplaints || []
+    });
+  } catch (err) {
+    next(err);
+  }
 }
 
 export async function assignComplaint(req, res, next) {
