@@ -1,7 +1,6 @@
 // client/src/pages/public/LandingPage.jsx
 import Navbar from '../../components/landing/Navbar';
 import Hero from '../../components/landing/Hero';
-import StatsSection from '../../components/landing/StatsSection';
 import FeaturesSection from '../../components/landing/FeaturesSection';
 import HowItWorksSection from '../../components/landing/HowItWorksSection';
 import CategoriesSection from '../../components/landing/CategoriesSection';
@@ -17,10 +16,7 @@ export default function LandingPage() {
       {/* 2. Hero Section (Split into two columns with AI Smart City illustration) */}
       <Hero />
 
-      {/* 3. Live Metrics & Stats Bar */}
-      <StatsSection />
-
-      {/* 4. Features Section */}
+      {/* 3. Features Section */}
       <FeaturesSection />
 
       {/* 5. How It Works Process Section */}

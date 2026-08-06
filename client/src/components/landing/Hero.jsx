@@ -45,7 +45,7 @@ export default function Hero() {
             </p>
 
             {/* Two CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto mb-10">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
               <Link
                 to="/register"
                 className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl font-semibold text-base text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
@@ -60,35 +60,6 @@ export default function Hero() {
                 <User className="w-4 h-4 text-slate-500" />
                 Sign In to Platform
               </Link>
-            </div>
-
-            {/* Small Trusted Users Section */}
-            <div className="flex items-center gap-3 text-xs sm:text-sm font-medium text-slate-600">
-              <div className="flex items-center -space-x-2">
-                <img
-                  className="inline-block h-7 w-7 rounded-full ring-2 ring-white object-cover"
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
-                  alt="Citizen 1"
-                />
-                <img
-                  className="inline-block h-7 w-7 rounded-full ring-2 ring-white object-cover"
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80"
-                  alt="Citizen 2"
-                />
-                <img
-                  className="inline-block h-7 w-7 rounded-full ring-2 ring-white object-cover"
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
-                  alt="Citizen 3"
-                />
-                <img
-                  className="inline-block h-7 w-7 rounded-full ring-2 ring-white object-cover"
-                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80"
-                  alt="Citizen 4"
-                />
-              </div>
-              <span className="text-slate-600 font-medium">
-                Trusted by <strong className="text-slate-900 font-semibold">10,000+ citizens</strong> & <strong className="text-slate-900 font-semibold">25+ departments</strong>
-              </span>
             </div>
 
           </motion.div>
