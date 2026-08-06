@@ -19,18 +19,18 @@ const categories = [
 
 export default function CategoriesSection() {
   return (
-    <section className="py-20 bg-white relative">
+    <section className="py-20 bg-white dark:bg-slate-900 relative transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold mb-4">
-            <Tag className="w-3.5 h-3.5 text-indigo-600" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold mb-4">
+            <Tag className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
             Comprehensive Coverage
           </div>
-          <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 mb-3">
+          <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 dark:text-white mb-3">
             What Can You Report?
           </h2>
-          <p className="text-slate-600 text-sm sm:text-base">
+          <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base">
             Our Gemini AI is trained to recognize over 50+ types of civic issues across all major municipal departments.
           </p>
         </div>
@@ -44,16 +44,16 @@ export default function CategoriesSection() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: idx * 0.04 }}
               viewport={{ once: true }}
-              className={`flex items-center gap-3 bg-slate-50/80 border border-slate-200/90 rounded-2xl px-4 py-3.5 transition-all duration-200 cursor-default shadow-2xs group hover:-translate-y-0.5 ${cat.color}`}
+              className={`flex items-center gap-3 bg-slate-50/80 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700/80 rounded-2xl px-4 py-3.5 transition-all duration-200 cursor-default shadow-2xs group hover:-translate-y-0.5 ${cat.color}`}
             >
               <span className="text-2xl group-hover:scale-125 transition-transform duration-200">
                 {cat.emoji}
               </span>
               <div className="flex flex-col min-w-0">
-                <span className="text-sm font-bold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">
+                <span className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                   {cat.name}
                 </span>
-                <span className="text-[11px] font-medium text-slate-500 truncate">
+                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
                   {cat.dept}
                 </span>
               </div>

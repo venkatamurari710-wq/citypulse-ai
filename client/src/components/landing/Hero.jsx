@@ -25,21 +25,21 @@ export default function Hero() {
             className="lg:col-span-6 flex flex-col items-start text-left"
           >
             {/* Small Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-200/80 text-indigo-700 text-xs font-semibold mb-6 shadow-2xs cursor-default">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200/80 dark:border-indigo-800/80 text-indigo-700 dark:text-indigo-300 text-xs font-semibold mb-6 shadow-2xs cursor-default">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
               <span>Powered by Google Gemini AI</span>
             </div>
 
             {/* Large Bold Heading */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold text-slate-900 tracking-tight leading-[1.12] mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.12] mb-6">
               Smarter Cities.<br />
-              <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 dark:from-indigo-400 dark:via-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
                 Faster Civic Resolutions.
               </span>
             </h1>
 
             {/* Description */}
-            <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal mb-8 max-w-xl">
+            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed font-normal mb-8 max-w-xl">
               CityPulse AI transforms citizen complaints into actionable civic intelligence.
               Report issues in text, photos, videos, or voice — our AI handles classification and routing.
             </p>
@@ -55,9 +55,9 @@ export default function Hero() {
               </Link>
               <Link
                 to="/login"
-                className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl font-semibold text-base text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/90 shadow-2xs hover:shadow-md transition-all duration-200"
+                className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl font-semibold text-base text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/90 dark:border-slate-700 shadow-2xs hover:shadow-md transition-all duration-200"
               >
-                <User className="w-4 h-4 text-slate-500" />
+                <User className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                 Sign In to Platform
               </Link>
             </div>

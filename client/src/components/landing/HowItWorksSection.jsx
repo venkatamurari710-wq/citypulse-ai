@@ -39,19 +39,19 @@ const steps = [
 
 export default function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="py-20 lg:py-28 bg-slate-50 relative overflow-hidden">
+    <section id="how-it-works" className="py-20 lg:py-28 bg-slate-50 dark:bg-slate-950 relative overflow-hidden transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/80 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 text-xs font-semibold mb-4">
             <Sparkles className="w-3.5 h-3.5" />
             Simple 4-Step Process
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-slate-900 tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
             From Complaint to Resolution in Hours
           </h2>
-          <p className="text-slate-600 text-base sm:text-lg">
+          <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg">
             See how CityPulse AI eliminates manual bureaucracy with automated neural classification and instant dispatch.
           </p>
         </div>
@@ -68,12 +68,12 @@ export default function HowItWorksSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: idx * 0.15 }}
                 viewport={{ once: true }}
-                className="relative bg-white rounded-3xl p-7 border border-slate-200/80 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
+                className="relative bg-white dark:bg-slate-900 rounded-3xl p-7 border border-slate-200/80 dark:border-slate-800 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
               >
                 <div>
                   {/* Step Header */}
                   <div className="flex items-center justify-between mb-6">
-                    <span className="font-display font-extrabold text-3xl text-slate-300 group-hover:text-indigo-600 transition-colors">
+                    <span className="font-display font-extrabold text-3xl text-slate-300 dark:text-slate-700 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                       {item.step}
                     </span>
                     <div
@@ -83,8 +83,8 @@ export default function HowItWorksSection() {
                     </div>
                   </div>
 
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">{item.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed mb-6 font-normal">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{item.title}</h3>
+                  <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 font-normal">
                     {item.desc}
                   </p>
                 </div>

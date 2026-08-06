@@ -1,14 +1,16 @@
 // client/src/components/landing/Navbar.jsx
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Shield, Menu, X, ArrowRight } from 'lucide-react';
+import { Shield, Menu, X, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Home');
   const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,7 +54,7 @@ export default function Navbar() {
     <header
       className={`sticky top-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-white/90 backdrop-blur-xl border-b border-indigo-100/80 shadow-xs py-3.5'
+          ? 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-indigo-100/80 dark:border-slate-800 shadow-xs py-3.5'
           : 'bg-transparent border-b border-transparent py-5'
       }`}
     >
@@ -62,7 +64,7 @@ export default function Navbar() {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-blue-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/25 group-hover:scale-105 transition-transform">
             <Shield className="w-5 h-5 fill-white/20" />
           </div>
-          <span className="font-display font-extrabold text-2xl tracking-tight text-slate-900 flex items-center gap-1">
+          <span className="font-display font-extrabold text-2xl tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
             CityPulse <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">AI</span>
           </span>
         </Link>
@@ -77,14 +79,16 @@ export default function Navbar() {
                 to={item.href}
                 onClick={() => setActiveTab(item.name)}
                 className={`relative py-1 text-sm font-semibold transition-colors ${
-                  isActive ? 'text-indigo-600 font-bold' : 'text-slate-700 hover:text-indigo-600'
+                  isActive
+                    ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'
                 }`}
               >
                 {item.name}
                 {isActive && (
                   <motion.div
                     layoutId="activeTabUnderline"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-indigo-600 rounded-full"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-indigo-600 dark:bg-indigo-400 rounded-full"
                   />
                 )}
               </Link>
@@ -94,14 +98,16 @@ export default function Navbar() {
                 href={item.href}
                 onClick={(e) => handleNavClick(e, item)}
                 className={`relative py-1 text-sm font-semibold transition-colors ${
-                  isActive ? 'text-indigo-600 font-bold' : 'text-slate-700 hover:text-indigo-600'
+                  isActive
+                    ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'
                 }`}
               >
                 {item.name}
                 {isActive && (
                   <motion.div
                     layoutId="activeTabUnderline"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-indigo-600 rounded-full"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-indigo-600 dark:bg-indigo-400 rounded-full"
                   />
                 )}
               </a>
@@ -109,11 +115,25 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Right CTA Buttons */}
+        {/* Right CTA Buttons & Theme Toggle */}
         <div className="hidden sm:flex items-center gap-3">
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-2xs"
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label="Toggle Dark or Light Theme"
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-4 h-4 text-amber-400" />
+            ) : (
+              <Moon className="w-4 h-4 text-slate-700" />
+            )}
+          </button>
+
           <Link
             to="/login"
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-indigo-600 bg-white hover:bg-indigo-50 border border-indigo-200 hover:border-indigo-300 transition-all duration-200 shadow-2xs"
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-indigo-200 dark:border-slate-700 hover:border-indigo-300 transition-all duration-200 shadow-2xs"
           >
             Sign In
           </Link>
@@ -125,11 +145,18 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Mobile menu button */}
+        {/* Mobile menu & Theme toggle button */}
         <div className="flex md:hidden items-center gap-2">
           <button
+            onClick={toggleTheme}
+            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-300 border border-slate-200 dark:border-slate-700"
+            title="Toggle Theme"
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+          </button>
+          <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2.5 rounded-xl text-slate-700 hover:text-indigo-600 hover:bg-slate-100 focus:outline-none transition-colors"
+            className="p-2.5 rounded-xl text-slate-700 dark:text-slate-200 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none transition-colors"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

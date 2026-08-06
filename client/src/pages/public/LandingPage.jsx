@@ -9,7 +9,7 @@ import FooterSection from '../../components/landing/FooterSection';
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased overflow-x-hidden selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased overflow-x-hidden selection:bg-indigo-500 selection:text-white transition-colors duration-300">
       {/* 1. Navigation Bar */}
       <Navbar />
 

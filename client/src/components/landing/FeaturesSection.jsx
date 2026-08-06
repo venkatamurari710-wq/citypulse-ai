@@ -79,21 +79,21 @@ const itemVariants = {
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="py-20 lg:py-28 bg-white relative overflow-hidden">
+    <section id="features" className="py-20 lg:py-28 bg-white dark:bg-slate-900 relative overflow-hidden transition-colors duration-300">
       {/* Subtle background decoration */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-50/50 rounded-full blur-3xl -z-10" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-50/50 dark:bg-indigo-950/20 rounded-full blur-3xl -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-semibold mb-4">
             <Layers className="w-3.5 h-3.5" />
             Cutting-Edge Capabilities
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-slate-900 tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
             Built for the Next Generation of Smart Cities
           </h2>
-          <p className="text-slate-600 text-base sm:text-lg">
+          <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg">
             Empowering municipal teams with AI automation while giving citizens unprecedented transparency and resolution speed.
           </p>
         </div>
@@ -112,7 +112,7 @@ export default function FeaturesSection() {
               <motion.div
                 key={f.title}
                 variants={itemVariants}
-                className="group relative bg-slate-50/70 hover:bg-white border border-slate-200/80 hover:border-indigo-300 rounded-3xl p-7 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                className="group relative bg-slate-50/70 dark:bg-slate-800/60 hover:bg-white dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 hover:border-indigo-300 dark:hover:border-indigo-500 rounded-3xl p-7 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
@@ -121,15 +121,15 @@ export default function FeaturesSection() {
                     >
                       <Icon className="w-6 h-6" />
                     </div>
-                    <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-200/60 text-slate-700 group-hover:bg-indigo-50 group-hover:text-indigo-700 transition-colors">
+                    <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-200/60 dark:bg-slate-700 text-slate-700 dark:text-slate-300 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950 group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors">
                       {f.badge}
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-bold text-slate-900 mb-2.5 group-hover:text-indigo-600 transition-colors">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                     {f.title}
                   </h3>
-                  <p className="text-slate-600 text-sm leading-relaxed mb-6 font-normal">
+                  <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 font-normal">
                     {f.desc}
                   </p>
                 </div>
