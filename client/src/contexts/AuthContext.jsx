@@ -13,13 +13,30 @@ export function AuthProvider({ children }) {
   });
   const [loading, setLoading] = useState(true);
 
-  // Verify token on mount
+  // Verify token on mount / refresh
   useEffect(() => {
     const token = localStorage.getItem('citypulse_token');
-    if (!token) { setLoading(false); return; }
+    if (!token) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
     api.get('/auth/me')
-      .then(res => setUser(res.data.user))
-      .catch(() => { localStorage.removeItem('citypulse_token'); localStorage.removeItem('citypulse_user'); setUser(null); })
+      .then(res => {
+        if (res.data?.user) {
+          setUser(res.data.user);
+          localStorage.setItem('citypulse_user', JSON.stringify(res.data.user));
+        }
+      })
+      .catch((err) => {
+        console.warn('[AUTH] Session verification error on refresh:', err?.response?.data?.error || err.message);
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          localStorage.removeItem('citypulse_token');
+          localStorage.removeItem('citypulse_user');
+          setUser(null);
+        }
+      })
       .finally(() => setLoading(false));
   }, []);
 

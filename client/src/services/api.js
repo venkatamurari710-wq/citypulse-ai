@@ -38,16 +38,13 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// Response interceptor — handle auth errors globally
+// Response interceptor — handle auth errors cleanly
 api.interceptors.response.use(
   response => response,
   error => {
     if (error.response?.status === 401) {
       localStorage.removeItem('citypulse_token');
       localStorage.removeItem('citypulse_user');
-      if (!window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
-      }
     }
     return Promise.reject(error);
   }
