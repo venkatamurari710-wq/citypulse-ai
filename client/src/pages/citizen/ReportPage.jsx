@@ -194,25 +194,10 @@ export default function ReportPage() {
             <label htmlFor="address_text">Address or Landmark</label>
             <input id="address_text" type="text" value={form.address_text} onChange={set('address_text')} placeholder="e.g., 123 Main St, near City Hall" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="form-field">
-              <label htmlFor="lat">Latitude</label>
-              <input id="lat" type="number" step="any" value={form.latitude} onChange={set('latitude')} placeholder="e.g., 40.7128" />
-            </div>
-            <div className="form-field">
-              <label htmlFor="lon">Longitude</label>
-              <input id="lon" type="number" step="any" value={form.longitude} onChange={set('longitude')} placeholder="e.g., -74.0060" />
-            </div>
-          </div>
           <button type="button" onClick={getLocation} disabled={locating} className="btn-ghost flex items-center gap-2">
             {locating ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4 text-primary-600" />}
             {locating ? 'Capturing GPS...' : 'Use Current GPS Location'}
           </button>
-          {form.latitude && form.longitude && (
-            <p className="text-xs text-emerald-700 font-semibold flex items-center gap-1 bg-emerald-50 p-2 rounded-lg border border-emerald-200">
-              <CheckCircle className="w-4 h-4 text-emerald-600" /> Location captured: {form.latitude}, {form.longitude}
-            </p>
-          )}
         </div>
 
         {/* Media uploads */}
